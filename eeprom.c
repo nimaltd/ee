@@ -55,14 +55,11 @@ bool EE_Write(uint16_t VirtualAddress, uint32_t Data)
 		HAL_FLASH_Unlock();
 		for(uint16_t	i=0 ; i<_EEPROM_FLASH_PAGE_SIZE/4 ; i++)
 		{
-			if(EEPROMPageBackup[i]!=0xFFFFFFFF)
+      if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])==false)
 			{
-				if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])==false)
-				{
-					HAL_FLASH_Lock();
-					return false;
-				}
-			}
+				HAL_FLASH_Lock();
+				return false;
+			}			
 		}
 	}	
 	HAL_FLASH_Unlock();
@@ -88,7 +85,7 @@ bool EE_Reads(uint16_t StartVirtualAddress,uint16_t HowMuchToRead,uint32_t* Data
 {
 	if((StartVirtualAddress+HowMuchToRead) >	(_EEPROM_FLASH_PAGE_SIZE/4))
 		return false;
-	for(uint16_t	i=StartVirtualAddress ; i<HowMuchToRead ; i++)
+	for(uint16_t	i=StartVirtualAddress ; i<HowMuchToRead+StartVirtualAddress ; i++)
 	{
 		*Data =  (*(__IO uint32_t*)((i*4)+_EEPROM_FLASH_PAGE_ADDRESS));
 		Data++;
@@ -112,13 +109,10 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 	HAL_FLASH_Unlock();
 	for(uint16_t	i=0 ; i<(_EEPROM_FLASH_PAGE_SIZE/4); i++)
 	{
-		if(EEPROMPageBackup[i]!=0xFFFFFFFF)
+		if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])!=HAL_OK)
 		{
-			if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])!=HAL_OK)
-			{
-				HAL_FLASH_Lock();
-				return false;
-			}
+			HAL_FLASH_Lock();
+			return false;
 		}
 	}
 	HAL_FLASH_Lock();
