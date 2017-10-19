@@ -55,7 +55,7 @@ bool EE_Write(uint16_t VirtualAddress, uint32_t Data)
 		HAL_FLASH_Unlock();
 		for(uint16_t	i=0 ; i<_EEPROM_FLASH_PAGE_SIZE/4 ; i++)
 		{
-      if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])==false)
+      if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])!=HAL_OK)
 			{
 				HAL_FLASH_Lock();
 				return false;
