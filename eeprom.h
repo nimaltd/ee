@@ -6,7 +6,6 @@
 
 
 //################################################################################################################
-bool 	EE_Init(void);
 bool	EE_Format(void);
 bool 	EE_Read(uint16_t VirtualAddress, uint32_t* Data);
 bool 	EE_Write(uint16_t VirtualAddress, uint32_t Data);
