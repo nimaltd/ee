@@ -2,8 +2,40 @@
 #include "eeprom.h"
 #include "eepromConfig.h"
 
+#ifdef  _EEPROM_F1_LOW_DESTINY
+#define		_EEPROM_FLASH_PAGE_SIZE								1024
+/* Base address of the Flash sectors */
+#define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
+#define _EEPROM_FLASH_PAGE_ADDRESS    (ADDR_FLASH_PAGE_0|(_EEPROM_FLASH_PAGE_SIZE*_EEPROM_USE_FLASH_PAGE))
+#if (_EEPROM_USE_FLASH_PAGE>31)
+#error  "Please Enter currect value _EEPROM_USE_FLASH_PAGE  (0 to 31)"
+#endif
+#endif
+
+
+#ifdef  _EEPROM_F1_MEDIUM_DESTINY
+#define		_EEPROM_FLASH_PAGE_SIZE								1024
+/* Base address of the Flash sectors */
+#define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
+#define _EEPROM_FLASH_PAGE_ADDRESS    (ADDR_FLASH_PAGE_0|(_EEPROM_FLASH_PAGE_SIZE*_EEPROM_USE_FLASH_PAGE))
+#if (_EEPROM_USE_FLASH_PAGE>127)
+#error  "Please Enter currect value _EEPROM_USE_FLASH_PAGE  (0 to 127)"
+#endif
+#endif
+
+
+#ifdef  _EEPROM_F1_HIGH_DESTINY
+#define		_EEPROM_FLASH_PAGE_SIZE								2048
+/* Base address of the Flash sectors */
+#define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 2 Kbytes */
+#define _EEPROM_FLASH_PAGE_ADDRESS    (ADDR_FLASH_PAGE_0|(_EEPROM_FLASH_PAGE_SIZE*_EEPROM_USE_FLASH_PAGE))
+#if (_EEPROM_USE_FLASH_PAGE>255)
+#error  "Please Enter currect value _EEPROM_USE_FLASH_PAGE  (0 to 255)"
+#endif
+#endif
 
 uint32_t	EEPROMPageBackup[_EEPROM_FLASH_PAGE_SIZE/4];
+
 //##########################################################################################################
 //##########################################################################################################
 //##########################################################################################################
