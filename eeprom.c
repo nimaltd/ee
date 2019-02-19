@@ -2,7 +2,7 @@
 #include "eeprom.h"
 #include "eepromConfig.h"
 
-#ifdef  _EEPROM_F1_LOW_DESTINY
+#if 	( _EEPROM_F1_LOW_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								1024
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
@@ -13,7 +13,7 @@
 #endif
 
 
-#ifdef  _EEPROM_F1_MEDIUM_DESTINY
+#if  (_EEPROM_F1_MEDIUM_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								1024
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
@@ -24,13 +24,23 @@
 #endif
 
 
-#ifdef  _EEPROM_F1_HIGH_DESTINY
+#if  (_EEPROM_F1_HIGH_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								2048
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 2 Kbytes */
 #define _EEPROM_FLASH_PAGE_ADDRESS    (ADDR_FLASH_PAGE_0|(_EEPROM_FLASH_PAGE_SIZE*_EEPROM_USE_FLASH_PAGE))
 #if (_EEPROM_USE_FLASH_PAGE>255)
 #error  "Please Enter currect value _EEPROM_USE_FLASH_PAGE  (0 to 255)"
+#endif
+#endif
+
+#if (_EEPROM_F030x4_F030x6_F070x6_F030x8==1)
+#define		_EEPROM_FLASH_PAGE_SIZE								1024
+/* Base address of the Flash sectors */
+#define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 2 Kbytes */
+#define _EEPROM_FLASH_PAGE_ADDRESS    (ADDR_FLASH_PAGE_0|(_EEPROM_FLASH_PAGE_SIZE*_EEPROM_USE_FLASH_PAGE))
+#if (_EEPROM_USE_FLASH_PAGE>63)
+#error  "Please Enter currect value _EEPROM_USE_FLASH_PAGE  (0 to 63)"
 #endif
 #endif
 
@@ -45,7 +55,9 @@ bool	EE_Format(void)
 	HAL_FLASH_Unlock();
 	FLASH_EraseInitTypeDef	flashErase;
 	flashErase.NbPages=1;
+	#if ( _EEPROM_F1_LOW_DESTINY==1 || _EEPROM_F1_MEDIUM_DESTINY==1 || _EEPROM_F1_HIGH_DESTINY==1 )
 	flashErase.Banks = FLASH_BANK_1;
+	#endif
 	flashErase.PageAddress = _EEPROM_FLASH_PAGE_ADDRESS;
 	flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
 	if(HAL_FLASHEx_Erase(&flashErase,&error)==HAL_OK)
@@ -149,5 +161,10 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 	}
 	HAL_FLASH_Lock();
 	return true;
+}
+//##########################################################################################################
+uint16_t	EE_GetSize(void)
+{
+	return _EEPROM_FLASH_PAGE_SIZE;	
 }
 //##########################################################################################################
