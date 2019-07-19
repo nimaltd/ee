@@ -1,5 +1,6 @@
 # EEPROM emulation STM32 series library
 <br />
+[![Github All Releases](https://img.shields.io/github/downloads/aeonix/aeon/total.svg)](../../releases)
 I hope use it and enjoy.
 <br />
 I use Stm32f103C8 and Keil Compiler and Stm32CubeMX wizard.
