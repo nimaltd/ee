@@ -1,8 +1,8 @@
 
 #include "eeprom.h"
-#include "eepromConfig.h"
+#include "eepromConf.h"
 
-#if 	( _EEPROM_F1_LOW_DESTINY==1)
+#if ( _EEPROM_F1_LOW_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								1024
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
@@ -13,7 +13,7 @@
 #endif
 
 
-#if  (_EEPROM_F1_MEDIUM_DESTINY==1)
+#if (_EEPROM_F1_MEDIUM_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								1024
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 1 Kbytes */
@@ -24,7 +24,7 @@
 #endif
 
 
-#if  (_EEPROM_F1_HIGH_DESTINY==1)
+#if (_EEPROM_F1_HIGH_DESTINY==1)
 #define		_EEPROM_FLASH_PAGE_SIZE								2048
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_PAGE_0     ((uint32_t)0x08000000) /* Base @ of Page 0, 2 Kbytes */
@@ -87,7 +87,7 @@ bool EE_Write(uint16_t VirtualAddress, uint32_t Data)
 	if(VirtualAddress >=	(_EEPROM_FLASH_PAGE_SIZE/4))
 		return false;
 
-	#if (_EEPROM_AUTO_ERASE___NEED_MORE_RAM==1)
+	#if (_EEPROM_STORE_BEFOR_ERASE___NEED_MORE_RAM==1)
 	if((*(__IO uint32_t*)((VirtualAddress*4)+_EEPROM_FLASH_PAGE_ADDRESS)) != 0xFFFFFFFF)
 	{
 		
@@ -144,7 +144,7 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 {
 	if((StartVirtualAddress+HowMuchToWrite) >	(_EEPROM_FLASH_PAGE_SIZE/4))
 		return false;
-	#if (_EEPROM_AUTO_ERASE___NEED_MORE_RAM==1)
+	#if (_EEPROM_STORE_BEFOR_ERASE___NEED_MORE_RAM==1)
 	if( EE_Reads(0,(_EEPROM_FLASH_PAGE_SIZE/4),EEPROMPageBackup)==false)
 		return false;
 	for(uint16_t	i=StartVirtualAddress ; i<HowMuchToWrite+StartVirtualAddress ; i++)
@@ -156,7 +156,7 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 		return false;
 	#endif
 	HAL_FLASH_Unlock();
-	#if (_EEPROM_AUTO_ERASE___NEED_MORE_RAM==1)
+	#if (_EEPROM_STORE_BEFOR_ERASE___NEED_MORE_RAM==1)
 	for(uint16_t	i=0 ; i<(_EEPROM_FLASH_PAGE_SIZE/4); i++)
 	{		
 		if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(i*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)EEPROMPageBackup[i])!=HAL_OK)
