@@ -128,11 +128,11 @@ bool EE_Write(uint16_t VirtualAddress, uint32_t Data)
 	return true;
 }
 //##########################################################################################################
-bool EE_Reads(uint16_t StartVirtualAddress,uint16_t HowMuchToRead,uint32_t* Data)
+bool EE_Reads(uint16_t StartVirtualAddress,uint16_t HowManyToRead,uint32_t* Data)
 {
-	if((StartVirtualAddress+HowMuchToRead) >	(_EEPROM_FLASH_PAGE_SIZE/4))
+	if((StartVirtualAddress+HowManyToRead) >	(_EEPROM_FLASH_PAGE_SIZE/4))
 		return false;
-	for(uint16_t	i=StartVirtualAddress ; i<HowMuchToRead+StartVirtualAddress ; i++)
+	for(uint16_t	i=StartVirtualAddress ; i<HowManyToRead+StartVirtualAddress ; i++)
 	{
 		*Data =  (*(__IO uint32_t*)((i*4)+_EEPROM_FLASH_PAGE_ADDRESS));
 		Data++;
@@ -140,9 +140,9 @@ bool EE_Reads(uint16_t StartVirtualAddress,uint16_t HowMuchToRead,uint32_t* Data
 	return true;
 }
 //##########################################################################################################
-bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* Data)
+bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowManyToWrite,uint32_t* Data)
 {
-	if((StartVirtualAddress+HowMuchToWrite) >	(_EEPROM_FLASH_PAGE_SIZE/4))
+	if((StartVirtualAddress+HowManyToWrite) >	(_EEPROM_FLASH_PAGE_SIZE/4))
 		return false;
 	#if (_EEPROM_STORE_BEFOR_ERASE___NEED_MORE_RAM==1)
 	if( EE_Reads(0,(_EEPROM_FLASH_PAGE_SIZE/4),EEPROMPageBackup)==false)
@@ -167,7 +167,7 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 	}
 	#else
 	HAL_FLASH_Unlock();
-	for(uint16_t i=0; i<HowMuchToWrite ; i++)
+	for(uint16_t i=0; i<HowManyToWrite ; i++)
 	{		
 		if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,((i+StartVirtualAddress)*4)+_EEPROM_FLASH_PAGE_ADDRESS,(uint64_t)Data[i])!=HAL_OK)
 		{
@@ -183,5 +183,10 @@ bool 	EE_Writes(uint16_t StartVirtualAddress,uint16_t HowMuchToWrite,uint32_t* D
 uint16_t	EE_GetSize(void)
 {
 	return _EEPROM_FLASH_PAGE_SIZE;	
+}
+//##########################################################################################################
+uint16_t	EE_GetMaximumVirtualAddress(void)
+{
+	return _EEPROM_FLASH_PAGE_SIZE/4;	
 }
 //##########################################################################################################
