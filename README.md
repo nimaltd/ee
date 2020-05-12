@@ -8,6 +8,10 @@ This is the EEPROM emulation STM32 HAL Library
 
 You can add your MCU config.
 
+* [ ] F0 tested.
+* [x] F1 tested.
+* [ ] F4 tested.
+
 How to use this Library:
 * Select "General peripheral Initalizion as a pair of '.c/.h' file per peripheral" on project settings.   
 * Include Header and source into your project.   
