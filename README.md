@@ -17,7 +17,7 @@ You can add your MCU config.
 * [ ] F4 tested.
 * [ ] L4 tested.
 * [ ] F7 tested.
-* [ ] H4 tested.
+* [ ] H7 tested.
 
 How to use this Library:
 * Select "General peripheral Initalizion as a pair of '.c/.h' file per peripheral" on project settings.   
