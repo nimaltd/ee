@@ -5,7 +5,6 @@
 * https://www.youtube.com/channel/UCUhY7qY1klJm1d2kulr9ckw   
 
 This is the EEPROM emulation STM32 HAL Library  
-Read and Write half word data.
 You can add your MCU config.
 
 * [ ] F0 tested.
