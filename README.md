@@ -9,8 +9,15 @@ Read and Write half word data.
 You can add your MCU config.
 
 * [ ] F0 tested.
+* [ ] L0 tested.
 * [x] F1 tested.
+* [ ] L1 tested.
+* [ ] F2 tested.
+* [ ] F3 tested.
 * [ ] F4 tested.
+* [ ] L4 tested.
+* [ ] F7 tested.
+* [ ] H4 tested.
 
 How to use this Library:
 * Select "General peripheral Initalizion as a pair of '.c/.h' file per peripheral" on project settings.   
