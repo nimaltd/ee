@@ -117,7 +117,7 @@
 #endif
 
 #if (_EE_USE_RAM_BYTE > 0)
-uint16_t ee_ram[_EE_USE_RAM_BYTE / 2];
+uint8_t ee_ram[_EE_USE_RAM_BYTE];
 #endif
 
 //##########################################################################################################
@@ -168,52 +168,63 @@ bool ee_format(bool keepRamData)
 	return false;	
 }
 //##########################################################################################################
-bool ee_read(uint32_t startVirtualAddress, uint32_t lenHalfWord, uint16_t* data)
+bool ee_read(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
 {
-	if ((startVirtualAddress + lenHalfWord) >	(_EE_SIZE / 2))
+	if ((startVirtualAddress + len) >	_EE_SIZE)
 		return false;
-	for (uint32_t	i = startVirtualAddress ; i < lenHalfWord + startVirtualAddress ; i++)
+	for (uint32_t	i = startVirtualAddress ; i < len + startVirtualAddress ; i++)
 	{
     if (data != NULL)
     {
-      *data =  (*(__IO uint16_t*)(i + _EE_ADDR_INUSE));
+      *data =  (*(__IO uint8_t*)(i + _EE_ADDR_INUSE));
       data++;
     }
     #if (_EE_USE_RAM_BYTE > 0)
     if ( i < _EE_USE_RAM_BYTE)
-      ee_ram[i] = (*(__IO uint16_t*)(i + _EE_ADDR_INUSE));
+      ee_ram[i] = (*(__IO uint8_t*)(i + _EE_ADDR_INUSE));
     #endif		
 	}
 	return true;
 }
 //##########################################################################################################
-bool ee_write(uint32_t startVirtualAddress, uint32_t lenHalfWord, uint16_t* data)
+bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
 {
-	if ((startVirtualAddress + lenHalfWord) >	(_EE_SIZE / 2))
+	if ((startVirtualAddress + len) >	_EE_SIZE)
 		return false;
   if (data == NULL)
     return false;
 	HAL_FLASH_Unlock();
-  for (uint32_t i = 0; i < lenHalfWord ; i++)
+  #ifdef FLASH_TYPEPROGRAM_BYTE
+  for (uint32_t i = 0; i < len ; i++)
 	{		
-		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
+		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
 		{
 			HAL_FLASH_Lock();
 			return false;
 		}
 	}	
+  #else
+  for (uint32_t i = 0; i < len ; i+=2)
+	{		
+		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
+		{
+			HAL_FLASH_Lock();
+			return false;
+		}
+	}	
+  #endif  
 	HAL_FLASH_Lock();
 	return true;
 }
 //##########################################################################################################
-bool ee_writeToRam(uint32_t startVirtualAddress, uint32_t lenHalfWord, uint16_t* data)
+bool ee_writeToRam(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
 {
   #if (_EE_USE_RAM_BYTE > 0)
-  if ((startVirtualAddress + lenHalfWord) >	(_EE_USE_RAM_BYTE / 2))
+  if ((startVirtualAddress + len) >	_EE_USE_RAM_BYTE)
 		return false;
   if (data == NULL)
     return false;
-  memcpy(&ee_ram[startVirtualAddress], data, lenHalfWord);  
+  memcpy(&ee_ram[startVirtualAddress], data, len);  
   return true;
   #else
   return false;
@@ -233,6 +244,6 @@ bool  ee_writeRamToFlash(void)
 //##########################################################################################################
 uint32_t  ee_maxVirtualAddress(void)
 {
-  return (_EE_SIZE / 2);  
+  return (_EE_SIZE);  
 }
 //##########################################################################################################
