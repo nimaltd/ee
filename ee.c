@@ -231,7 +231,7 @@ bool ee_writeToRam(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
   #endif  
 }
 //##########################################################################################################
-bool  ee_writeRamToFlash(void)
+bool  ee_commit(void)
 {
   #if (_EE_USE_RAM_BYTE > 0)
   if (ee_format(true) == false)
