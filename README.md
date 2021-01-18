@@ -12,7 +12,7 @@ You can add your MCU config.
 * [ ] L1 tested.
 * [ ] F2 tested.
 * [ ] F3 tested.
-* [ ] F4 tested.
+* [x] F4 tested.
 * [ ] L4 tested.
 * [ ] F7 tested.
 * [ ] H7 tested.
