@@ -107,9 +107,37 @@
 #define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
 #define   _EE_FLASH_BANK        FLASH_BANK_1
 #define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
-#define   _EE_PAGE_OR_SECTOR    PAGE
+#define   _EE_PAGE_OR_SECTOR    SECTOR
 #if (_EE_USE_FLASH_PAGE_OR_SECTOR > 11)
 #error  "Please Enter correct address, maximum is (11)"
+#endif
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
+#error  "Please Enter correct address, minimum is (5)"
+#endif
+#endif
+
+#if defined(STM32F411xC)
+#define   _EE_SIZE              (1024 * 128)
+#define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
+#define   _EE_FLASH_BANK        FLASH_BANK_1
+#define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
+#define   _EE_PAGE_OR_SECTOR    SECTOR
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 5)
+#error  "Please Enter correct address, maximum is (5)"
+#endif
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
+#error  "Please Enter correct address, minimum is (5)"
+#endif
+#endif
+
+#if defined(STM32F411xE)
+#define   _EE_SIZE              (1024 * 128)
+#define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
+#define   _EE_FLASH_BANK        FLASH_BANK_1
+#define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
+#define   _EE_PAGE_OR_SECTOR    SECTOR
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 7)
+#error  "Please Enter correct address, maximum is (7)"
 #endif
 #if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
 #error  "Please Enter correct address, minimum is (5)"
