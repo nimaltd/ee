@@ -251,23 +251,23 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
   HAL_FLASH_Unlock();
 #ifdef FLASH_TYPEPROGRAM_BYTE
   for (uint32_t i = 0; i < len ; i++)
-	{		
-		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
-		{
-			HAL_FLASH_Lock();
-			return false;
-		}
-	}	
+  {		
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
+    {
+      HAL_FLASH_Lock();
+      return false;
+    }
+  }	
 #endif
 #ifdef FLASH_TYPEPROGRAM_HALFWORD
   for (uint32_t i = 0; i < len ; i+=2)
-	{		
-		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
-		{
-			HAL_FLASH_Lock();
-			return false;
-		}
-	}	
+  {		
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
+    {
+      HAL_FLASH_Lock();
+      return false;
+    }
+  }	
 #endif
 #ifdef FLASH_TYPEPROGRAM_DOUBLEWORD
   for (uint32_t i = 0; i < len; i += 8)
@@ -287,8 +287,8 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
     }
   }
 #endif
-	HAL_FLASH_Lock();
-	return true;
+  HAL_FLASH_Lock();
+  return true;
 }
 //##########################################################################################################
 bool ee_writeToRam(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
