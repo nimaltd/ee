@@ -166,6 +166,7 @@
 #error  "Please Enter correct address, maximum is (511)"
 #endif
 #endif
+#endif
 
 #if (_EE_USE_RAM_BYTE > 0)
 uint8_t ee_ram[_EE_USE_RAM_BYTE];
