@@ -189,7 +189,7 @@ bool ee_format(bool keepRamData)
   FLASH_EraseInitTypeDef flashErase;
 #if _EE_PAGE_OR_SECTOR == PAGE
 	flashErase.NbPages = 1;
-  flashErase.PageAddress = _EE_ADDR_INUSE;
+  flashErase.PageAddress = _EE_USE_FLASH_PAGE_OR_SECTOR;
   flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
 #elif _EE_PAGE_OR_SECTOR == SECTOR
   flashErase.NbSectors = 1;
