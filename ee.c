@@ -193,7 +193,7 @@ bool ee_format(bool keepRamData)
   flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
 #elif _EE_PAGE_OR_SECTOR == SECTOR
   flashErase.NbSectors = 1;
-  flashErase.Sector =  _EE_ADDR_INUSE;
+  flashErase.Sector =  _EE_USE_FLASH_PAGE_OR_SECTOR;
   flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
 #elif _EE_PAGE_OR_SECTOR == PAGE_NUM
   flashErase.NbPages = 1;
