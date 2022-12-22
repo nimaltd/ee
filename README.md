@@ -1,7 +1,7 @@
 # EEPROM emulation STM32 series library
 * http://www.github.com/NimaLTD   
 * https://www.instagram.com/github.nimaltd/   
-* https://www.youtube.com/channel/UCUhY7qY1klJm1d2kulr9ckw   
+* https://www.youtube.com/@nimaltd  
 
 This is the EEPROM emulation STM32 HAL Library  
 You can add your MCU config.
