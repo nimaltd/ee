@@ -144,6 +144,15 @@
 #endif
 #endif
 
+#if defined(STM32G030xx_H)
+#define   _EE_SIZE              2048
+#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
+#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 31)
+#error  "Please Enter correct address, maximum is (31)"
+#endif
+#endif
+
 #if defined(STM32L433xx)
 #define   _EE_SIZE              2048
 #define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
