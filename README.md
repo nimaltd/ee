@@ -7,7 +7,7 @@ This is the EEPROM emulation STM32 HAL Library
 You can add your MCU config.
 
 * [x] F0 tested.
-* [ ] G0 tested. (STM32G030xx)
+* [x] G0 tested.
 * [ ] L0 tested.
 * [x] F1 tested.
 * [ ] L1 tested.
