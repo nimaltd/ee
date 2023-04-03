@@ -18,7 +18,7 @@
 #endif
 
 #if defined(STM32F103x8)
-#define   _EE_SIZE          		1024
+#define   _EE_SIZE          	1024
 #define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
 #define   _EE_FLASH_BANK        FLASH_BANK_1
 #define   _EE_PAGE_OR_SECTOR    PAGE
