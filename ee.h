@@ -7,8 +7,11 @@
   Instagram:  http://instagram.com/github.NimaLTD
   Youtube:    https://www.youtube.com/channel/UCUhY7qY1klJm1d2kulr9ckw
   
-  Version:    2.0.3
+  Version:    2.0.4
 
+	(2.0.4)
+  Add G030, G050, G070.
+	
   (2.0.3)
   Add F411.
   
