@@ -5,9 +5,12 @@
   Author:     Nima Askari
   WebSite:    http://www.github.com/NimaLTD
   Instagram:  http://instagram.com/github.NimaLTD
-  Youtube:    https://www.youtube.com/channel/UCUhY7qY1klJm1d2kulr9ckw
+  Youtube:    https://www.youtube.com/@NimaLTD
   
-  Version:    2.0.4
+  Version:    2.0.5
+
+	(2.0.5)
+  Add U575, U585.
 
   (2.0.4)
   Add G030, G050, G070.

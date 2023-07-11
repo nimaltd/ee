@@ -186,6 +186,22 @@
 #endif
 #endif
 
+// 2MB version
+#if defined(STM32U575xx) || defined(STM32U585xx)
+#define   _EE_SIZE              8192
+#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
+#define   _EE_ICACHE_CTRL				1
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 128)
+#define   _EE_FLASH_BANK        FLASH_BANK_1
+#else
+#define   _EE_FLASH_BANK        FLASH_BANK_2
+#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 256)
+#error  "Please Enter correct address, maximum is (255)"
+#endif
+#endif
+#endif
+
 #if (_EE_USE_RAM_BYTE > 0)
 uint8_t ee_ram[_EE_USE_RAM_BYTE];
 #endif
@@ -204,6 +220,9 @@ bool ee_format(bool keepRamData)
 {
   uint32_t error;
   HAL_FLASH_Unlock();
+#if _EE_ICACHE_CTRL == 1
+  HAL_ICACHE_Disable();
+#endif
   FLASH_EraseInitTypeDef flashErase;
 #if _EE_PAGE_OR_SECTOR == PAGE
 	flashErase.NbPages = 1;
@@ -228,17 +247,28 @@ bool ee_format(bool keepRamData)
   {
     HAL_FLASH_Lock();
     if (error != 0xFFFFFFFF)
-      return false;
+    {
+#if _EE_ICACHE_CTRL == 1
+    HAL_ICACHE_Enable();
+#endif
+    	return false;
+    }
     else
     {
 #if (_EE_USE_RAM_BYTE > 0)
       if (keepRamData == false)
         memset(ee_ram, 0xFF, _EE_USE_RAM_BYTE);
 #endif
+#if _EE_ICACHE_CTRL == 1
+      HAL_ICACHE_Enable();
+#endif
       return true;
     }
   }
   HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+  HAL_ICACHE_Enable();
+#endif
   return false;
 }
 //##########################################################################################################
@@ -268,12 +298,18 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
   if (data == NULL)
     return false;
   HAL_FLASH_Unlock();
+#if _EE_ICACHE_CTRL == 1
+  HAL_ICACHE_Disable();
+#endif
 #ifdef FLASH_TYPEPROGRAM_BYTE
   for (uint32_t i = 0; i < len ; i++)
   {		
     if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
     {
       HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+      HAL_ICACHE_Enable();
+#endif
       return false;
     }
   }	
@@ -284,6 +320,9 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
     if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
     {
       HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+      HAL_ICACHE_Enable();
+#endif
       return false;
     }
   }	
@@ -291,22 +330,45 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
 #ifdef FLASH_TYPEPROGRAM_DOUBLEWORD
   for (uint32_t i = 0; i < len; i += 8)
   {
-    uint64_t data64 = data[i];
-    data64 += data[i + 1] * 0x100;
-    data64 += data[i + 2] * 0x10000;
-    data64 += data[i + 3] * 0x1000000;
-    data64 += data[i + 4] * 0x100000000;
-    data64 += data[i + 5] * 0x10000000000;
-    data64 += data[i + 6] * 0x1000000000000;
-    data64 += data[i + 7] * 0x100000000000000;
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, data64) != HAL_OK)
+  	uint8_t DoubleWord[8] =
+		{
+			data[i + 0], data[i + 1], data[i + 2], data[i + 3], data[i + 4],\
+			data[i + 5], data[i + 6], data[i + 7]
+		};
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint32_t)DoubleWord) != HAL_OK)
     {
       HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+      HAL_ICACHE_Enable();
+#endif
+      return false;
+    }
+  }
+#endif
+#ifdef FLASH_TYPEPROGRAM_QUADWORD
+  for (uint32_t i = 0; i < len; i += 16)
+  {
+		uint8_t QuadWord[16] =
+		{
+			data[i + 0], data[i + 1], data[i + 2], data[i + 3], data[i + 4],\
+			data[i + 5], data[i + 6], data[i + 7], data[i + 8], data[i + 9],\
+			data[i + 10], data[i + 11], data[i + 12], data[i + 13], data[i + 14],\
+			data[i + 15]
+		};
+		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint32_t)QuadWord) != HAL_OK)
+    {
+      HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+      HAL_ICACHE_Enable();
+#endif
       return false;
     }
   }
 #endif
   HAL_FLASH_Lock();
+#if _EE_ICACHE_CTRL == 1
+  HAL_ICACHE_Enable();
+#endif
   return true;
 }
 //##########################################################################################################
