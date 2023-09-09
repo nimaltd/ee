@@ -196,8 +196,24 @@
 #else
 #define   _EE_FLASH_BANK        FLASH_BANK_2
 #define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 256)
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 255)
 #error  "Please Enter correct address, maximum is (255)"
+#endif
+#endif
+#endif
+
+// 4MB version
+#if defined(STM32U599xx)
+#define   _EE_SIZE              8192
+#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
+#define   _EE_ICACHE_CTRL				1
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 256)
+#define   _EE_FLASH_BANK        FLASH_BANK_1
+#else
+#define   _EE_FLASH_BANK        FLASH_BANK_2
+#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
+#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 511)
+#error  "Please Enter correct address, maximum is (511)"
 #endif
 #endif
 #endif
