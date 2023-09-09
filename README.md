@@ -4,7 +4,7 @@
 * https://www.youtube.com/@nimaltd  
 
 This is the EEPROM emulation STM32 HAL Library  
-You can add your MCU config.
+You can add your MCU.
 
 * [x] F0 tested.
 * [x] G0 tested.
