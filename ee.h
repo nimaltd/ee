@@ -7,9 +7,12 @@
   Instagram:  http://instagram.com/github.NimaLTD
   Youtube:    https://www.youtube.com/@NimaLTD
   
-  Version:    2.0.5
+  Version:    2.0.6
 
-	(2.0.5)
+  (2.0.6)
+  Fix Write bug.
+
+  (2.0.5)
   Add U575, U585.
 
   (2.0.4)
