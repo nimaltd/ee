@@ -329,8 +329,7 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
       return false;
     }
   }	
-#endif
-#ifdef FLASH_TYPEPROGRAM_HALFWORD
+#elif FLASH_TYPEPROGRAM_HALFWORD
   for (uint32_t i = 0; i < len ; i+=2)
   {		
     if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
@@ -342,8 +341,7 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
       return false;
     }
   }	
-#endif
-#ifdef FLASH_TYPEPROGRAM_DOUBLEWORD
+#elif FLASH_TYPEPROGRAM_DOUBLEWORD
   for (uint32_t i = 0; i < len; i += 8)
   {
   	uint8_t DoubleWord[8] =
@@ -360,8 +358,7 @@ bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
       return false;
     }
   }
-#endif
-#ifdef FLASH_TYPEPROGRAM_QUADWORD
+#elif FLASH_TYPEPROGRAM_QUADWORD
   for (uint32_t i = 0; i < len; i += 16)
   {
 		uint8_t QuadWord[16] =
