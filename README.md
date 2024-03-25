@@ -51,7 +51,15 @@ int main(void)
   .
   EE_Init(&ee, sizeof(Stotrage_t));
   EE_Read();
-
+  ee.val1 = 1;
+  ee.val2 = 2;
+  ee.val3 = 3;
+  ee.val4 = 4;
+  ee.val5 = 5;
+  ee.val6 = 6;
+  ee.val7 = 7;
+  ee.val8 = 8;
+  EE_Write(true);
   while (1)
   {
 
