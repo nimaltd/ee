@@ -25,7 +25,7 @@ Coming Soon
 ---
 The old Version: https://github.com/nimaltd/EE/archive/refs/tags/2.0.6.zip 
 
-'''
+```
 #include "ee.h"
 typedef struct
 {
@@ -57,6 +57,4 @@ int main(void)
 
   }
 }
-
-
-'''
+```
