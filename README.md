@@ -20,7 +20,9 @@
 ---
 # Watch the Video:
 
-Coming Soon
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=o80ugfjuZ-o"><img src="https://img.youtube.com/vi/o80ugfjuZ-o/0.jpg" alt="Video"></a>
+</div>
 
 ---
 The old Version: https://github.com/nimaltd/ee/archive/refs/tags/V2.0.6.zip
