@@ -114,9 +114,9 @@
 #endif
 #endif
 
-#if    defined FLASH_BANK_2)
+#if    defined FLASH_BANK_2
 #define  EE_BANK_SELECT                     FLASH_BANK_2
-#elif  (defined FLASH_BANK_1)
+#elif  defined FLASH_BANK_1
 #define EE_BANK_SELECT                      FLASH_BANK_1
 #endif
 
@@ -150,7 +150,6 @@ EE_HandleTypeDef eeHandle;
 **************    Private Functions
 ************************************************************************************************************/
 
-// none
 
 /************************************************************************************************************
 **************    Public Functions
