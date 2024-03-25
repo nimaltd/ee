@@ -1,58 +1,65 @@
-#ifndef __EEPROM_H
-#define __EEPROM_H
+#ifndef _EE_H_
+#define _EE_H_
 
-/*
+/***********************************************************************************************************
+
   Author:     Nima Askari
-  WebSite:    http://www.github.com/NimaLTD
-  Instagram:  http://instagram.com/github.NimaLTD
-  Youtube:    https://www.youtube.com/@NimaLTD
-  
-  Version:    2.0.6
+  Github:     https://www.github.com/NimaLTD
+  LinkedIn:   https://www.linkedin.com/in/nimaltd
+  Youtube:    https://www.youtube.com/@nimaltd
+  Instagram:  https://instagram.com/github.NimaLTD
 
-  (2.0.6)
-  Fix Write bug.
+  Version:    3.0.0
 
-  (2.0.5)
-  Add U575, U585.
+  History:
 
-  (2.0.4)
-  Add G030, G050, G070.
-	
-  (2.0.3)
-  Add F411.
-  
-  (2.0.2)
-  Add L4.  
-  
-  (2.0.1)
-  Change function name to ee_commit().
-  
-  Reversion History:
-  (2.0.0)
-  Rewrite again.
+              3.0.0
+              - Rewrite again
+              - Support STM32CubeMx Packet installer
 
-*/
+***********************************************************************************************************/
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
+
+/************************************************************************************************************
+**************    Include Headers
+************************************************************************************************************/
 
 #include <stdbool.h>
 #include "main.h"
 
-//################################################################################################################
-bool      ee_init(void);
-bool      ee_format(bool keepRamData);
-bool      ee_read(uint32_t startVirtualAddress, uint32_t len, uint8_t* data);
-bool      ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t* data);
-bool      ee_writeToRam(uint32_t startVirtualAddress, uint32_t len, uint8_t* data); //  only use when _EE_USE_RAM_BYTE is enabled
-bool      ee_commit(void);  //  only use when _EE_USE_RAM_BYTE is enabled
-uint32_t  ee_maxVirtualAddress(void);
+/************************************************************************************************************
+**************    Public Definitions
+************************************************************************************************************/
 
-//################################################################################################################
+
+/************************************************************************************************************
+**************    Public struct/enum
+************************************************************************************************************/
+
+typedef struct
+{
+  uint32_t               MagicWord;
+  uint8_t                *DataPointer;
+  uint32_t               Size;
+  uint32_t               Lock;
+
+} EE_HandleTypeDef;
+
+/************************************************************************************************************
+**************    Public Functions
+************************************************************************************************************/
+
+bool      EE_Init(void *StoragePointer, uint32_t Size);
+uint32_t  EE_Capacity(void);
+bool      EE_Format(bool EraseBuffer);
+void      EE_Read(void);
+bool      EE_Write(bool FormatFirst);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

@@ -1,417 +1,360 @@
 
+/************************************************************************************************************
+**************    Include Headers
+************************************************************************************************************/
+
 #include "ee.h"
-#include "eeConfig.h"
 #include <string.h>
 
-#define   PAGE                  0
-#define   SECTOR                1
-#define   PAGE_NUM              2
+/************************************************************************************************************
+**************    Private Definitions
+************************************************************************************************************/
 
-#if defined(STM32F103xB)
-#define   _EE_SIZE              1024
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 127)
-#error  "Please Enter correct address, maximum is (127)"
-#endif
-#endif
+#define EE_ERASE_PAGE_ADDRESS               0
+#define EE_ERASE_PAGE_NUMBER                1
+#define EE_ERASE_SECTOR_NUMBER              2
 
-#if defined(STM32F103x8)
-#define   _EE_SIZE          	1024
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 63)
-#error  "Please Enter correct address, maximum is (63)"
-#endif
+#ifdef  STM32F0
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
+#define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
 #endif
 
-#if defined(STM32F103xC)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 127)
-#error  "Please Enter correct address, maximum is (127)"
-#endif
+#ifdef  STM32F1
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
+#define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
 #endif
 
-#if defined(STM32F103xD)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 191)
-#error  "Please Enter correct address, maximum is (191)"
-#endif
+#ifdef  STM32F2
+#define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
+#define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
 #endif
 
-#if defined(STM32F103xE)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 255)
-#error  "Please Enter correct address, maximum is (255)"
-#endif
+#ifdef  STM32F3
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
+#define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
 #endif
 
-#if defined(STM32F030x4) || defined(STM32F042x4)  || defined(STM32F070x4)
-#define   _EE_SIZE              1024
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 15)
-#error  "Please Enter correct address, maximum is (15)"
-#endif
+#ifdef  STM32F4
+#define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
+#define EE_SIZE                             0x20000
+#define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
 #endif
 
-#if  defined(STM32F030x6) || defined(STM32F042x6) || defined(STM32F070x6)
-#define   _EE_SIZE              1024
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 31)
-#error  "Please Enter correct address, maximum is (31)"
-#endif
+#ifdef  STM32F7
+#define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
+#define EE_SIZE                             0x20000
 #endif
 
-#if defined(STM32F030x8) || defined(STM32F042x8)
-#define   _EE_SIZE              1024
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 63)
-#error  "Please Enter correct address, maximum is (63)"
-#endif
+#ifdef  STM32H5
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #endif
 
-#if defined(STM32F070xB)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 63)
-#error  "Please Enter correct address, maximum is (63)"
-#endif
+#ifdef  STM32H7
+#define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
 #endif
 
-#if defined(STM32F070xC)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 127)
-#error  "Please Enter correct address, maximum is (127)"
-#endif
+#ifdef  STM32G0
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
 #endif
 
-#if defined(STM32F405xx) || defined(STM32F407xx) || defined(STM32F415xx) || defined(STM32F417xx)
-#define   _EE_SIZE              (1024 * 128)
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
-#define   _EE_PAGE_OR_SECTOR    SECTOR
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 11)
-#error  "Please Enter correct address, maximum is (11)"
+#ifdef  STM32G4
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
 #endif
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
-#error  "Please Enter correct address, minimum is (5)"
+
+#ifdef  STM32U0
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32U5
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32L0
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32L1
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32L4
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32L5
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32WB
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32W0
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32WBA
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#undef  FLASH_BANK_1
+#endif
+
+#ifdef  STM32WL
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifdef  STM32C0
+#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#endif
+
+#ifndef EE_SIZE
+#if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
+#define EE_SIZE                           FLASH_PAGE_SIZE
+#elif (EE_ERASE == EE_ERASE_SECTOR_NUMBER)
+#define EE_SIZE                           FLASH_SECTOR_SIZE
 #endif
 #endif
 
-#if defined(STM32F411xC)
-#define   _EE_SIZE              (1024 * 128)
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
-#define   _EE_PAGE_OR_SECTOR    SECTOR
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 5)
-#error  "Please Enter correct address, maximum is (5)"
-#endif
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
-#error  "Please Enter correct address, minimum is (5)"
-#endif
+#if    defined FLASH_BANK_2)
+#define  EE_BANK_SELECT                     FLASH_BANK_2
+#elif  (defined FLASH_BANK_1)
+#define EE_BANK_SELECT                      FLASH_BANK_1
 #endif
 
-#if defined(STM32F411xE)
-#define   _EE_SIZE              (1024 * 128)
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08020000) | (_EE_SIZE*(_EE_USE_FLASH_PAGE_OR_SECTOR - 5)))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_VOLTAGE_RANGE     _EE_VOLTAGE
-#define   _EE_PAGE_OR_SECTOR    SECTOR
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 7)
-#error  "Please Enter correct address, maximum is (7)"
-#endif
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 5)
-#error  "Please Enter correct address, minimum is (5)"
-#endif
-#endif
-
-#if defined(STM32G030xx) || defined(STM32G050xx)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 31)
-#error  "Please Enter correct address, maximum is (31)"
-#endif
-#endif
-
-#if defined(STM32G070xx)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 63)
-#error  "Please Enter correct address, maximum is (63)"
-#endif
-#endif
-
-#if defined(STM32L433xx)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 127)
-#error  "Please Enter correct address, maximum is (127)"
-#endif
-#endif
-
-#if defined(STM32L476xx)
-#define   _EE_SIZE              2048
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 256)
-#define   _EE_FLASH_BANK        FLASH_BANK_1
+#ifndef EE_PAGE_SECTOR
+#if (EE_BANK_SELECT ==  FLASH_BANK_2)
+#define EE_PAGE_SECTOR                      ((FLASH_SIZE / EE_SIZE / 2) - 1)
 #else
-#define   _EE_FLASH_BANK        FLASH_BANK_2
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 511)
-#error  "Please Enter correct address, maximum is (511)"
-#endif
+#define EE_PAGE_SECTOR                      ((FLASH_SIZE / EE_SIZE) - 1)
 #endif
 #endif
 
-// 2MB version
-#if defined(STM32U575xx) || defined(STM32U585xx)
-#define   _EE_SIZE              8192
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_ICACHE_CTRL				1
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 128)
-#define   _EE_FLASH_BANK        FLASH_BANK_1
+#ifndef EE_ADDRESS
+#if (EE_BANK_SELECT !=  FLASH_BANK_2)
+#define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * EE_PAGE_SECTOR)
 #else
-#define   _EE_FLASH_BANK        FLASH_BANK_2
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 255)
-#error  "Please Enter correct address, maximum is (255)"
-#endif
+#define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * (EE_PAGE_SECTOR * 2 + 1))
 #endif
 #endif
 
-// 4MB version
-#if defined(STM32U599xx)
-#define   _EE_SIZE              8192
-#define   _EE_ADDR_INUSE        (((uint32_t)0x08000000) | (_EE_SIZE * _EE_USE_FLASH_PAGE_OR_SECTOR))
-#define   _EE_ICACHE_CTRL				1
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR < 256)
-#define   _EE_FLASH_BANK        FLASH_BANK_1
-#else
-#define   _EE_FLASH_BANK        FLASH_BANK_2
-#define   _EE_PAGE_OR_SECTOR    PAGE_NUM
-#if (_EE_USE_FLASH_PAGE_OR_SECTOR > 511)
-#error  "Please Enter correct address, maximum is (511)"
-#endif
-#endif
+#ifndef EE_ERASE
+#error "Not Supported MCU!"
 #endif
 
-#if (_EE_USE_RAM_BYTE > 0)
-uint8_t ee_ram[_EE_USE_RAM_BYTE];
-#endif
+/************************************************************************************************************
+**************    Private Variables
+************************************************************************************************************/
 
-//##########################################################################################################
-bool ee_init(void)
+EE_HandleTypeDef eeHandle;
+
+/************************************************************************************************************
+**************    Private Functions
+************************************************************************************************************/
+
+
+/************************************************************************************************************
+**************    Public Functions
+************************************************************************************************************/
+
+/**
+  * @brief  Initialize the EEPROM.
+  * @note   Assign a struct/array for storing your data
+  *
+  * @param  StoragePointer: Pointer to Storing data
+  * @param  Size: Size of Storage, It should be equal or lower than latest sector/page of selected MCU
+  *
+  * @retval bool: true or false
+  */
+bool EE_Init(void *StoragePointer, uint32_t Size)
 {
-#if (_EE_USE_RAM_BYTE > 0)
-  return ee_read(0, _EE_USE_RAM_BYTE, NULL);
-#else
-  return true;
-#endif
-}
-//##########################################################################################################
-bool ee_format(bool keepRamData)
-{
-  uint32_t error;
-  HAL_FLASH_Unlock();
-#if _EE_ICACHE_CTRL == 1
-  HAL_ICACHE_Disable();
-#endif
-  FLASH_EraseInitTypeDef flashErase;
-#if _EE_PAGE_OR_SECTOR == PAGE
-	flashErase.NbPages = 1;
-  flashErase.PageAddress = _EE_ADDR_INUSE;
-  flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-#elif _EE_PAGE_OR_SECTOR == SECTOR
-  flashErase.NbSectors = 1;
-  flashErase.Sector =  _EE_USE_FLASH_PAGE_OR_SECTOR;
-  flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
-#elif _EE_PAGE_OR_SECTOR == PAGE_NUM
-  flashErase.NbPages = 1;
-  flashErase.Page = _EE_USE_FLASH_PAGE_OR_SECTOR;
-  flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-#endif
-#ifdef _EE_FLASH_BANK
-  flashErase.Banks = _EE_FLASH_BANK;
-#endif
-#ifdef _EE_VOLTAGE_RANGE
-  flashErase.VoltageRange = _EE_VOLTAGE_RANGE;
-#endif
-  if (HAL_FLASHEx_Erase(&flashErase, &error) == HAL_OK)
+  bool answer = false;
+  do
   {
-    HAL_FLASH_Lock();
+    if (Size > EE_SIZE)
+    {
+      break;
+    }
+    eeHandle.Size = Size;
+    eeHandle.DataPointer = (uint8_t*)StoragePointer;
+    answer = true;
+
+  } while (0);
+
+  return answer;
+}
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Get Capacity of EEPROM
+  * @note   It shall return the latest sector/page size
+  *
+  * @retval uint32_t: Returned size in bytes
+  */
+uint32_t EE_Capacity(void)
+{
+  return EE_SIZE;
+}
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Get Capacity of EEPROM
+  * @note   It shall return the latest sector/page size
+  *
+  * @param  EraseBuffer: Erase data buffer of Storage or not
+  *
+  * @retval bool: true or false
+  */
+bool EE_Format(bool EraseBuffer)
+{
+  bool answer = false;
+  uint32_t error;
+  FLASH_EraseInitTypeDef flashErase;
+  do
+  {
+    HAL_FLASH_Unlock();
+#ifdef HAL_ICACHE_MODULE_ENABLED
+    HAL_ICACHE_Disable();
+#endif
+#if EE_ERASE == EE_ERASE_PAGE_ADDRESS
+    flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
+    flashErase.PageAddress = EE_ADDRESS;
+    flashErase.NbPages = 1;
+#elif EE_ERASE == EE_ERASE_PAGE_NUMBER
+    flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
+    flashErase.Page = EE_PAGE_SECTOR;
+    flashErase.NbPages = 1;
+#else
+    flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
+    flashErase.Sector = EE_PAGE_SECTOR;
+    flashErase.NbSectors = 1;
+#endif
+#ifdef EE_BANK_SELECT
+    flashErase.Banks = EE_BANK_SELECT;
+#endif
+#ifdef FLASH_VOLTAGE_RANGE_3
+    flashErase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+#endif
+    if (HAL_FLASHEx_Erase(&flashErase, &error) != HAL_OK)
+    {
+      break;
+    }
     if (error != 0xFFFFFFFF)
     {
-#if _EE_ICACHE_CTRL == 1
-    HAL_ICACHE_Enable();
-#endif
-    	return false;
+      break;
     }
-    else
-    {
-#if (_EE_USE_RAM_BYTE > 0)
-      if (keepRamData == false)
-        memset(ee_ram, 0xFF, _EE_USE_RAM_BYTE);
-#endif
-#if _EE_ICACHE_CTRL == 1
-      HAL_ICACHE_Enable();
-#endif
-      return true;
-    }
-  }
+    answer = true;
+
+  } while (0);
+
   HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
+#ifdef HAL_ICACHE_MODULE_ENABLED
   HAL_ICACHE_Enable();
 #endif
-  return false;
+  return answer;
 }
-//##########################################################################################################
-bool ee_read(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Read all data
+  * @note   Read from flash memory and fill up the buffer
+  *
+  * @param  none
+  *
+  * @retval none
+  */
+void EE_Read(void)
 {
-  if ((startVirtualAddress + len) > _EE_SIZE)
-    return false;
-  for (uint32_t i = startVirtualAddress; i < len + startVirtualAddress; i++)
+  uint8_t *data = eeHandle.DataPointer;
+  for (uint32_t i = 0; i < eeHandle.Size; i++)
   {
-    if (data != NULL)
-    {
-      *data = (*(__IO uint8_t*) (i + _EE_ADDR_INUSE));
-      data++;
-    }
-#if (_EE_USE_RAM_BYTE > 0)
-    if (i < _EE_USE_RAM_BYTE)
-      ee_ram[i] = (*(__IO uint8_t*) (i + _EE_ADDR_INUSE));
-#endif
+    *data = (*(__IO uint8_t*) (EE_ADDRESS + i));
+    data++;
   }
-  return true;
 }
-//##########################################################################################################
-bool ee_write(uint32_t startVirtualAddress, uint32_t len, uint8_t *data)
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Write Buffer to flash memory
+  * @note
+  *
+  * @param  FormatFirst: Format the flash before writing
+  *
+  * @retval bool: true or false
+  */
+bool EE_Write(bool FormatFirst)
 {
-  if ((startVirtualAddress + len) > _EE_SIZE)
-    return false;
-  if (data == NULL)
-    return false;
-  HAL_FLASH_Unlock();
-#if _EE_ICACHE_CTRL == 1
-  HAL_ICACHE_Disable();
-#endif
-#ifdef FLASH_TYPEPROGRAM_BYTE
-  for (uint32_t i = 0; i < len ; i++)
-  {		
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i])) != HAL_OK)
-    {
-      HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
-      HAL_ICACHE_Enable();
-#endif
-      return false;
-    }
-  }	
-#elif FLASH_TYPEPROGRAM_HALFWORD
-  for (uint32_t i = 0; i < len ; i+=2)
-  {		
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint64_t)(data[i] | (data[i+1] << 8))) != HAL_OK)
-    {
-      HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
-      HAL_ICACHE_Enable();
-#endif
-      return false;
-    }
-  }	
-#elif FLASH_TYPEPROGRAM_DOUBLEWORD
-  for (uint32_t i = 0; i < len; i += 8)
+  bool answer = true;
+  uint8_t *data = eeHandle.DataPointer;
+  do
   {
-  	uint8_t DoubleWord[8] =
-		{
-			data[i + 0], data[i + 1], data[i + 2], data[i + 3], data[i + 4],\
-			data[i + 5], data[i + 6], data[i + 7]
-		};
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint32_t)DoubleWord) != HAL_OK)
+    if (FormatFirst)
     {
-      HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
-      HAL_ICACHE_Enable();
-#endif
-      return false;
+      if (EE_Format(false) == false)
+      {
+        answer = false;
+        break;
+      }
     }
-  }
-#elif FLASH_TYPEPROGRAM_QUADWORD
-  for (uint32_t i = 0; i < len; i += 16)
-  {
-		uint8_t QuadWord[16] =
-		{
-			data[i + 0], data[i + 1], data[i + 2], data[i + 3], data[i + 4],\
-			data[i + 5], data[i + 6], data[i + 7], data[i + 8], data[i + 9],\
-			data[i + 10], data[i + 11], data[i + 12], data[i + 13], data[i + 14],\
-			data[i + 15]
-		};
-		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, ((i + startVirtualAddress)) + _EE_ADDR_INUSE, (uint32_t)QuadWord) != HAL_OK)
+    HAL_FLASH_Unlock();
+#ifdef HAL_ICACHE_MODULE_ENABLED
+    HAL_ICACHE_Disable();
+#endif
+#if (defined FLASH_TYPEPROGRAM_HALFWORD)
+    for (uint32_t i = 0; i < eeHandle.Size ; i += 2)
     {
-      HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
-      HAL_ICACHE_Enable();
-#endif
-      return false;
+      uint64_t halfWord;
+      memcpy((uint8_t*)&halfWord, data, 2);
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, EE_ADDRESS + i, halfWord) != HAL_OK)
+      {
+        answer = false;
+        break;
+      }
+      data += 2;
     }
-  }
+#elif (defined FLASH_TYPEPROGRAM_DOUBLEWORD)
+    for (uint32_t i = 0; i < eeHandle.Size; i += 8)
+    {
+      uint64_t doubleWord;
+      memcpy((uint8_t*)&doubleWord, data, 8);
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, EE_ADDRESS + i, doubleWord) != HAL_OK)
+      {
+        answer = false;
+        break;
+      }
+      data += 8;
+    }
+#elif (defined FLASH_TYPEPROGRAM_QUADWORD)
+    for (uint32_t i = 0; i < eeHandle.Size; i += 16)
+    {
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
+      {
+        answer = false;
+        break;
+      }
+      data += 16;
+    }
+#elif (defined FLASH_TYPEPROGRAM_FLASHWORD)
+    for (uint32_t i = 0; i < eeHandle.Size; i += 32)
+    {
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
+      {
+        answer = false;
+        break;
+      }
+      data += 32;
+    }
 #endif
+
+  } while (0);
+
   HAL_FLASH_Lock();
-#if _EE_ICACHE_CTRL == 1
+#ifdef HAL_ICACHE_MODULE_ENABLED
   HAL_ICACHE_Enable();
 #endif
-  return true;
+  return answer;
 }
-//##########################################################################################################
-bool ee_writeToRam(uint32_t startVirtualAddress, uint32_t len, uint8_t* data)
-{
-#if (_EE_USE_RAM_BYTE > 0)
-  if ((startVirtualAddress + len) > _EE_USE_RAM_BYTE)
-    return false;
-  if (data == NULL)
-    return false;
-  memcpy(&ee_ram[startVirtualAddress], data, len);
-  return true;
-#else
-  return false;
-#endif
-}
-//##########################################################################################################
-bool  ee_commit(void)
-{
-#if (_EE_USE_RAM_BYTE > 0)
-  if (ee_format(true) == false)
-    return false;
-  return ee_write(0, _EE_USE_RAM_BYTE, ee_ram);
-#else
-  return false;
-#endif
-}
-//##########################################################################################################
-uint32_t  ee_maxVirtualAddress(void)
-{
-  return (_EE_SIZE);  
-}
-//##########################################################################################################
+
+/***********************************************************************************************************/
