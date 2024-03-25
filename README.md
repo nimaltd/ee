@@ -23,7 +23,7 @@
 Coming Soon
 
 ---
-The old Version: https://github.com/nimaltd/EE/archive/refs/tags/2.0.6.zip 
+The old Version: https://github.com/nimaltd/ee/archive/refs/tags/V2.0.6.zip
 
 ```
 #include "ee.h"
