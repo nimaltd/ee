@@ -14,6 +14,7 @@
 > [!CAUTION]
 > EEPROM Emulation Library may not be suitable for frequent data alterations.
 ---
+This library facilitates EEPROM emulation on microcontrollers by selecting the latest sector or page for emulation space. The size of the emulation space determines the maximum space available for storing data.
 ## Tested List:
 - [ ] STM32F0
 - [ ] STM32F1
