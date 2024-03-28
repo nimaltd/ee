@@ -34,7 +34,8 @@ This library facilitates EEPROM emulation on microcontrollers by selecting the l
 - [ ] STM32U0
 - [x] STM32U5
 - [ ] STM32WB
-- [ ] STM32WL    - [ ] STM32WBA
+- [ ] STM32WL
+- [ ] STM32WBA
 ---
 * Install Library from https://github.com/nimaltd/STM32-PACK/raw/main/EE/NimaLTD.I-CUBE-EE.pdsc
 * Add and enable it.
