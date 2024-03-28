@@ -9,6 +9,8 @@
 -  Instagram:  https://instagram.com/github.NimaLTD  
 ---  
 - Please Test Any MCU you have and tell me the result.
+> [!CAUTION]
+> EEPROM Emulation Library may not be suitable for frequent data alterations.
 ---
 * Install Library from https://github.com/nimaltd/STM32-PACK/raw/main/EE/NimaLTD.I-CUBE-EE.pdsc
 * Add and enable it.
