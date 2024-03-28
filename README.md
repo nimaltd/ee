@@ -17,28 +17,32 @@
 This library facilitates EEPROM emulation on microcontrollers by selecting the latest sector or page for emulation space.
 ## Tested List:
 - STM32F
-  -  - [ ] dadad
-  -  - [ ] dddddad
-- [ ] STM32F0
-- [ ] STM32F1
-- [ ] STM32F2
-- [ ] STM32F3
-- [ ] STM32F4
-- [ ] STM32F7
-- [ ] STM32L0
-- [ ] STM32L1
-- [ ] STM32L4
-- [ ] STM32L5 
-- [x] STM32C0
-- [ ] STM32G0
-- [x] STM32G4
-- [ ] STM32H5
-- [x] STM32H7
-- [ ] STM32U0
-- [x] STM32U5
-- [ ] STM32WB
-- [ ] STM32WL
-- [ ] STM32WBA
+  -  - [ ] STM32F0
+  -  - [ ] STM32F1
+  -  - [ ] STM32F2
+  -  - [ ] STM32F3
+  -  - [ ] STM32F4
+  -  - [ ] STM32F7
+- STM32L
+  -  - [ ] STM32L0
+  -  - [ ] STM32L1
+  -  - [ ] STM32L4
+  -  - [ ] STM32L5
+- STM32C
+  -  - [x] STM32C0
+  -  STM32G
+  -  - [ ] STM32G0
+  -  - [x] STM32G4
+- STM32H
+  -  - [ ] STM32H5
+  -  - [x] STM32H7
+- STM32U
+  -  - [ ] STM32U0
+  -  - [x] STM32U5
+- STM32W
+  -  - [ ] STM32WB
+  -  - [ ] STM32WL
+  -  - [ ] STM32WBA
 ---
 * Install Library from https://github.com/nimaltd/STM32-PACK/raw/main/EE/NimaLTD.I-CUBE-EE.pdsc
 * Add and enable it.
