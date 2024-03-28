@@ -30,7 +30,7 @@ This library facilitates EEPROM emulation on microcontrollers by selecting the l
   -  - [ ] STM32L5
 - STM32C
   -  - [x] STM32C0
-  -  STM32G
+- STM32G
   -  - [ ] STM32G0
   -  - [x] STM32G4
 - STM32H
