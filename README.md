@@ -17,8 +17,8 @@
 This library facilitates EEPROM emulation on microcontrollers by selecting the latest sector or page for emulation space.
 ## Tested List:
 - STM32F
---  - [ ] dadad
---  - [ ] dddddad
+  -  - [ ] dadad
+  -  - [ ] dddddad
 - [ ] STM32F0
 - [ ] STM32F1
 - [ ] STM32F2
