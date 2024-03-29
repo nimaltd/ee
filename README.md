@@ -17,7 +17,7 @@
 This library facilitates EEPROM emulation on microcontrollers by selecting the latest sector or page for emulation space.
 ## Tested List:
 ### STM32F
-  -  - [ ] STM32F0
+  -  - [x] STM32F0
   -  - [ ] STM32F1
   -  - [ ] STM32F2
   -  - [ ] STM32F3
@@ -31,7 +31,7 @@ This library facilitates EEPROM emulation on microcontrollers by selecting the l
 ### STM32C
   -  - [x] STM32C0
 ### STM32G
-  -  - [ ] STM32G0
+  -  - [x] STM32G0
   -  - [x] STM32G4
 ### STM32H
   -  - [ ] STM32H5
