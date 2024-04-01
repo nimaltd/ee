@@ -108,9 +108,9 @@
 
 #ifndef EE_SIZE
 #if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
-#define EE_SIZE                           FLASH_PAGE_SIZE
+#define EE_SIZE                             FLASH_PAGE_SIZE
 #elif (EE_ERASE == EE_ERASE_SECTOR_NUMBER)
-#define EE_SIZE                           FLASH_SECTOR_SIZE
+#define EE_SIZE                             FLASH_SECTOR_SIZE
 #endif
 #endif
 
@@ -156,13 +156,13 @@ EE_HandleTypeDef eeHandle;
 ************************************************************************************************************/
 
 /**
-  * @brief  Initialize the EEPROM.
-  * @note   Assign a struct/array for storing your data
-  *
-  * @param  StoragePointer: Pointer to Storing data
-  * @param  Size: Size of Storage, It should be equal or lower than latest sector/page of selected MCU
-  *
-  * @retval bool: true or false
+  * @brief Initializes the EEPROM emulation module.
+  * @note This function initializes the EEPROM emulation module to enable read and write operations.
+  * @param StoragePointer: Pointer to the start address of the EEPROM emulation area.
+  * @param Size: Size of the EEPROM emulation area in bytes.
+  * @return Boolean value indicating the success of the initialization:
+  *       - true: Initialization successful.
+  *       - false: Initialization failed.
   */
 bool EE_Init(void *StoragePointer, uint32_t Size)
 {
@@ -185,10 +185,9 @@ bool EE_Init(void *StoragePointer, uint32_t Size)
 /***********************************************************************************************************/
 
 /**
-  * @brief  Get Capacity of EEPROM
-  * @note   It shall return the latest sector/page size
-  *
-  * @retval uint32_t: Returned size in bytes
+  * @brief Retrieves the capacity of the EEPROM emulation area.
+  * @note This function returns the total capacity of the EEPROM emulation area in bytes.
+  * @return Capacity of the EEPROM emulation area in bytes.
   */
 uint32_t EE_Capacity(void)
 {
@@ -198,12 +197,15 @@ uint32_t EE_Capacity(void)
 /***********************************************************************************************************/
 
 /**
-  * @brief  Get Capacity of EEPROM
-  * @note   It shall return the latest sector/page size
-  *
-  * @param  EraseBuffer: Erase data buffer of Storage or not
-  *
-  * @retval bool: true or false
+  * @brief Formats the EEPROM emulation area.
+  * @note This function formats the EEPROM emulation area,
+  * optionally erasing its content.
+  * @param EraseBuffer Indicates whether to erase the content of the EEPROM emulation area:
+  *    - true: Erase the content of the EEPROM emulation area(In RAM).
+  *     - false: Do not erase the content (only format Flash).
+  * @return bool Boolean value indicating the success of the operation:
+  *     - true: Formatting successful.
+  *     - false: Formatting failed.
   */
 bool EE_Format(bool EraseBuffer)
 {
@@ -257,12 +259,9 @@ bool EE_Format(bool EraseBuffer)
 /***********************************************************************************************************/
 
 /**
-  * @brief  Read all data
-  * @note   Read from flash memory and fill up the buffer
-  *
-  * @param  none
-  *
-  * @retval none
+  * @brief Reads data from the EEPROM emulation area.
+  * @note This function reads data from the EEPROM emulation area
+  *  and loads it into the specified storage pointer.
   */
 void EE_Read(void)
 {
@@ -277,12 +276,13 @@ void EE_Read(void)
 /***********************************************************************************************************/
 
 /**
-  * @brief  Write Buffer to flash memory
-  * @note
-  *
-  * @param  FormatFirst: Format the flash before writing
-  *
-  * @retval bool: true or false
+  * @brief Writes data to the EEPROM emulation area.
+  * @note This function writes data to the EEPROM emulation area.
+  *       Optionally, the area can be formatted first before writing.
+  * @param FormatFirst: Indicates whether to format the EEPROM emulation area before writing:
+  *       - true: Format the Flash area before writing.
+  *       - false: Do not format the Flash area before writing.
+  * @retval true if the write operation is successful, false otherwise.
   */
 bool EE_Write(bool FormatFirst)
 {
