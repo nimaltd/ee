@@ -337,14 +337,14 @@ bool EE_Write(bool FormatFirst)
       data += 16;
     }
 #elif (defined FLASH_TYPEPROGRAM_FLASHWORD)
-    for (uint32_t i = 0; i < eeHandle.Size; i += 32)
+    for (uint32_t i = 0; i < eeHandle.Size; i += FLASH_NB_32BITWORD_IN_FLASHWORD * 4)
     {
       if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
       {
         answer = false;
         break;
       }
-      data += 32;
+      data += FLASH_NB_32BITWORD_IN_FLASHWORD * 4;
     }
 #endif
 
