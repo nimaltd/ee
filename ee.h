@@ -9,7 +9,7 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.0.0
+  Version:    3.0.2
 
   History:
               3.0.2
