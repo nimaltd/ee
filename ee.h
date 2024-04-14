@@ -12,7 +12,12 @@
   Version:    3.0.0
 
   History:
+              3.0.2
+              - Fixed Writing for H7B 
 
+              3.0.1
+              - Added comments
+              
               3.0.0
               - Rewrite again
               - Support STM32CubeMx Packet installer
