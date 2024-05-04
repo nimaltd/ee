@@ -169,8 +169,11 @@ bool EE_Init(void *StoragePointer, uint32_t Size)
   bool answer = false;
   do
   {
+    /* checking size of eeprom area*/
     if (Size > EE_SIZE)
     {
+      eeHandle.Size = 0;
+      eeHandle.DataPointer = NULL;
       break;
     }
     eeHandle.Size = Size;
@@ -199,15 +202,11 @@ uint32_t EE_Capacity(void)
 /**
   * @brief Formats the EEPROM emulation area.
   * @note This function formats the EEPROM emulation area,
-  * optionally erasing its content.
-  * @param EraseBuffer Indicates whether to erase the content of the EEPROM emulation area:
-  *    - true: Erase the content of the EEPROM emulation area(In RAM).
-  *     - false: Do not erase the content (only format Flash).
   * @return bool Boolean value indicating the success of the operation:
   *     - true: Formatting successful.
   *     - false: Formatting failed.
   */
-bool EE_Format(bool EraseBuffer)
+bool EE_Format(void)
 {
   bool answer = false;
   uint32_t error;
@@ -216,6 +215,7 @@ bool EE_Format(bool EraseBuffer)
   {
     HAL_FLASH_Unlock();
 #ifdef HAL_ICACHE_MODULE_ENABLED
+    /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
 #endif
 #if EE_ERASE == EE_ERASE_PAGE_ADDRESS
@@ -237,10 +237,12 @@ bool EE_Format(bool EraseBuffer)
 #ifdef FLASH_VOLTAGE_RANGE_3
     flashErase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 #endif
+    /* erasing page/sector */
     if (HAL_FLASHEx_Erase(&flashErase, &error) != HAL_OK)
     {
       break;
     }
+    /* checking result */
     if (error != 0xFFFFFFFF)
     {
       break;
@@ -266,10 +268,14 @@ bool EE_Format(bool EraseBuffer)
 void EE_Read(void)
 {
   uint8_t *data = eeHandle.DataPointer;
-  for (uint32_t i = 0; i < eeHandle.Size; i++)
+  if (data != NULL)
   {
-    *data = (*(__IO uint8_t*) (EE_ADDRESS + i));
-    data++;
+    /* reading flash */
+    for (uint32_t i = 0; i < eeHandle.Size; i++)
+    {
+      *data = (*(__IO uint8_t*) (EE_ADDRESS + i));
+      data++;
+    }
   }
 }
 
@@ -278,31 +284,33 @@ void EE_Read(void)
 /**
   * @brief Writes data to the EEPROM emulation area.
   * @note This function writes data to the EEPROM emulation area.
-  *       Optionally, the area can be formatted first before writing.
-  * @param FormatFirst: Indicates whether to format the EEPROM emulation area before writing:
-  *       - true: Format the Flash area before writing.
-  *       - false: Do not format the Flash area before writing.
   * @retval true if the write operation is successful, false otherwise.
   */
-bool EE_Write(bool FormatFirst)
+bool EE_Write(void)
 {
   bool answer = true;
   uint8_t *data = eeHandle.DataPointer;
   do
   {
-    if (FormatFirst)
+    /* checking eeprom is initialize correctly */
+    if (data == NULL)
     {
-      if (EE_Format(false) == false)
-      {
-        answer = false;
-        break;
-      }
+      answer = false;
+      break;
+    }
+    /* formating flash area before writing */
+    if (EE_Format() == false)
+    {
+      answer = false;
+      break;
     }
     HAL_FLASH_Unlock();
 #ifdef HAL_ICACHE_MODULE_ENABLED
+    /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
 #endif
 #if (defined FLASH_TYPEPROGRAM_HALFWORD)
+    /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size ; i += 2)
     {
       uint64_t halfWord;
@@ -315,6 +323,7 @@ bool EE_Write(bool FormatFirst)
       data += 2;
     }
 #elif (defined FLASH_TYPEPROGRAM_DOUBLEWORD)
+    /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size; i += 8)
     {
       uint64_t doubleWord;
@@ -327,6 +336,7 @@ bool EE_Write(bool FormatFirst)
       data += 8;
     }
 #elif (defined FLASH_TYPEPROGRAM_QUADWORD)
+    /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size; i += 16)
     {
       if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
@@ -337,6 +347,7 @@ bool EE_Write(bool FormatFirst)
       data += 16;
     }
 #elif (defined FLASH_TYPEPROGRAM_FLASHWORD)
+    /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size; i += FLASH_NB_32BITWORD_IN_FLASHWORD * 4)
     {
       if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
@@ -347,6 +358,17 @@ bool EE_Write(bool FormatFirst)
       data += FLASH_NB_32BITWORD_IN_FLASHWORD * 4;
     }
 #endif
+    /* verifying Flash content */
+    data = eeHandle.DataPointer;
+    for (uint32_t i = 0; i < eeHandle.Size; i++)
+    {
+      if (*data != (*(__IO uint8_t*) (EE_ADDRESS + i)))
+      {
+        answer = false;
+        break;
+      }
+      data++;
+    }
 
   } while (0);
 

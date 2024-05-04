@@ -95,7 +95,7 @@ int main(void)
   ee.val6 = 6;
   ee.val7 = 7;
   ee.val8 = 8;
-  EE_Write(true);
+  EE_Write();
   while (1)
   {
 
