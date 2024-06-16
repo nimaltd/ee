@@ -13,7 +13,7 @@
 
   History:
 							3.1.1
-              - Fixed formating F4
+              - Fixed formatting F4
 
               3.1.0
               - Added Verify after Writing
