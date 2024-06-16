@@ -9,9 +9,12 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.1.0
+  Version:    3.1.1
 
   History:
+							3.1.1
+              - Fixed formating F4
+
               3.1.0
               - Added Verify after Writing
               - Added Checking Pointer in Reading/Writing

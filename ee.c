@@ -38,6 +38,7 @@
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
 #define EE_SIZE                             0x20000
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
+#define FLASH_F4_OFFSET                     4
 #endif
 
 #ifdef  STM32F7
@@ -128,12 +129,17 @@
 #endif
 #endif
 
+
 #ifndef EE_ADDRESS
 #if (EE_BANK_SELECT !=  FLASH_BANK_2)
 #define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * EE_PAGE_SECTOR)
 #else
 #define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * (EE_PAGE_SECTOR * 2 + 1))
 #endif
+#endif
+
+#ifndef FLASH_F4_OFFSET
+#define FLASH_F4_OFFSET                     0
 #endif
 
 #ifndef EE_ERASE
@@ -228,7 +234,7 @@ bool EE_Format(void)
     flashErase.NbPages = 1;
 #else
     flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
-    flashErase.Sector = EE_PAGE_SECTOR;
+    flashErase.Sector = EE_PAGE_SECTOR + FLASH_F4_OFFSET;
     flashErase.NbSectors = 1;
 #endif
 #ifdef EE_BANK_SELECT
