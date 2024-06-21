@@ -47,7 +47,7 @@
 #endif
 
 #ifdef  STM32H5
-#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
+#define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
 #endif
 
 #ifdef  STM32H7
@@ -155,7 +155,6 @@ EE_HandleTypeDef eeHandle;
 /************************************************************************************************************
 **************    Private Functions
 ************************************************************************************************************/
-
 
 /************************************************************************************************************
 **************    Public Functions
@@ -274,6 +273,10 @@ bool EE_Format(void)
 void EE_Read(void)
 {
   uint8_t *data = eeHandle.DataPointer;
+#ifdef HAL_ICACHE_MODULE_ENABLED
+    /* disabling ICACHE if enabled*/
+    HAL_ICACHE_Disable();
+#endif
   if (data != NULL)
   {
     /* reading flash */
@@ -283,6 +286,10 @@ void EE_Read(void)
       data++;
     }
   }
+#ifdef HAL_ICACHE_MODULE_ENABLED
+    /* disabling ICACHE if enabled*/
+    HAL_ICACHE_Enable();
+#endif
 }
 
 /***********************************************************************************************************/

@@ -9,10 +9,13 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.1.1
+  Version:    3.1.2
 
   History:
-							3.1.1
+              3.1.2
+              - Fixed H5 configuration
+
+              3.1.1
               - Fixed formatting F4
 
               3.1.0
