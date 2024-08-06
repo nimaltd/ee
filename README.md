@@ -12,7 +12,8 @@
 > Please Test Any MCU you have and tell me the result.
 
 > [!CAUTION]
-> EEPROM Emulation Library may not be suitable for frequent data alterations.
+> EEPROM Emulation Library may not be suitable for frequent data alterations.  
+> It is not working on Dual pages Sector-Base Flash ( STM32F429II ...)
 ---
 This library facilitates EEPROM emulation on microcontrollers by selecting the latest sector or page for emulation space.
 ## Tested List:
