@@ -4,6 +4,7 @@
 ************************************************************************************************************/
 
 #include "ee.h"
+#include "NimaLTD.I-CUBE-EE_conf.h"
 #include <string.h>
 
 /************************************************************************************************************
@@ -36,14 +37,11 @@
 
 #ifdef  STM32F4
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
-#define EE_SIZE                             0x20000
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_F4_OFFSET                     4
 #endif
 
 #ifdef  STM32F7
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
-#define EE_SIZE                             0x20000
 #endif
 
 #ifdef  STM32H5
@@ -107,41 +105,6 @@
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
 #endif
 
-#ifndef EE_SIZE
-#if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
-#define EE_SIZE                             FLASH_PAGE_SIZE
-#elif (EE_ERASE == EE_ERASE_SECTOR_NUMBER)
-#define EE_SIZE                             FLASH_SECTOR_SIZE
-#endif
-#endif
-
-#if    defined FLASH_BANK_2
-#define  EE_BANK_SELECT                     FLASH_BANK_2
-#elif  defined FLASH_BANK_1
-#define EE_BANK_SELECT                      FLASH_BANK_1
-#endif
-
-#ifndef EE_PAGE_SECTOR
-#if (EE_BANK_SELECT ==  FLASH_BANK_2)
-#define EE_PAGE_SECTOR                      ((FLASH_SIZE / EE_SIZE / 2) - 1)
-#else
-#define EE_PAGE_SECTOR                      ((FLASH_SIZE / EE_SIZE) - 1)
-#endif
-#endif
-
-
-#ifndef EE_ADDRESS
-#if (EE_BANK_SELECT !=  FLASH_BANK_2)
-#define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * EE_PAGE_SECTOR)
-#else
-#define EE_ADDRESS                          (FLASH_BASE + EE_SIZE * (EE_PAGE_SECTOR * 2 + 1))
-#endif
-#endif
-
-#ifndef FLASH_F4_OFFSET
-#define FLASH_F4_OFFSET                     0
-#endif
-
 #ifndef EE_ERASE
 #error "Not Supported MCU!"
 #endif
@@ -163,26 +126,69 @@ EE_HandleTypeDef eeHandle;
 /**
   * @brief Initializes the EEPROM emulation module.
   * @note This function initializes the EEPROM emulation module to enable read and write operations.
-  * @param StoragePointer: Pointer to the start address of the EEPROM emulation area.
+  * @param pData: Pointer to the start address of the EEPROM emulation area.
   * @param Size: Size of the EEPROM emulation area in bytes.
   * @return Boolean value indicating the success of the initialization:
   *       - true: Initialization successful.
   *       - false: Initialization failed.
   */
-bool EE_Init(void *StoragePointer, uint32_t Size)
+bool EE_Init(void *pData, uint32_t Size)
 {
   bool answer = false;
   do
   {
+    if ((pData == NULL) || (Size == 0))
+    {
+      break;    
+    }
+#if EE_MANUAL_CONFIG == false
+#if defined FLASH_BANK_2
+    eeHandle.BankNumber = FLASH_BANK_2;
+#elif  defined FLASH_BANK_1
+    eeHandle.BankNumber = FLASH_BANK_1;
+#endif
+#if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
+#ifdef FLASH_PAGE_SIZE
+    eeHandle.PageSectorSize = FLASH_PAGE_SIZE;
+#endif
+#elif (EE_ERASE == EE_ERASE_SECTOR_NUMBER)
+#if defined FLASH_SECTOR_SIZE
+    eeHandle.PageSectorSize = FLASH_SECTOR_SIZE;
+#else
+#error EE Library should be set manually for your MCU!
+#endif
+#endif
+    if (eeHandle.BankNumber == FLASH_BANK_1)
+    {
+      eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
+    }
+    else
+    {
+      eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize / 2) - 1);
+    }
+    if (eeHandle.BankNumber == FLASH_BANK_1)
+    {
+      eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
+    }
+    else
+    {
+      eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * (eeHandle.PageSectorNumber * 2 + 1));
+    }
+#else // manual
+    eeHandle.BankNumber = EE_SELECTED_BANK;
+    eeHandle.PageSectorNumber = EE_SELECTED_PAGE_SECTOR_NUMBER;
+    eeHandle.PageSectorSize = EE_SELECTED_PAGE_SECTOR_SIZE;
+    eeHandle.Address = EE_SELECTED_ADDRESS;
+#endif
     /* checking size of eeprom area*/
-    if (Size > EE_SIZE)
+    if (Size > eeHandle.PageSectorSize)
     {
       eeHandle.Size = 0;
-      eeHandle.DataPointer = NULL;
+      eeHandle.pData = NULL;
       break;
     }
     eeHandle.Size = Size;
-    eeHandle.DataPointer = (uint8_t*)StoragePointer;
+    eeHandle.pData = (uint8_t*)pData;
     answer = true;
 
   } while (0);
@@ -199,7 +205,7 @@ bool EE_Init(void *StoragePointer, uint32_t Size)
   */
 uint32_t EE_Capacity(void)
 {
-  return EE_SIZE;
+  return eeHandle.PageSectorSize;
 }
 
 /***********************************************************************************************************/
@@ -225,15 +231,15 @@ bool EE_Format(void)
 #endif
 #if EE_ERASE == EE_ERASE_PAGE_ADDRESS
     flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-    flashErase.PageAddress = EE_ADDRESS;
+    flashErase.PageAddress = eeHandle.Address;
     flashErase.NbPages = 1;
 #elif EE_ERASE == EE_ERASE_PAGE_NUMBER
     flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-    flashErase.Page = EE_PAGE_SECTOR;
+    flashErase.Page = eeHandle.PageSectorNumber;
     flashErase.NbPages = 1;
 #else
     flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
-    flashErase.Sector = EE_PAGE_SECTOR + FLASH_F4_OFFSET;
+    flashErase.Sector = eeHandle.PageSectorNumber;
     flashErase.NbSectors = 1;
 #endif
 #ifdef EE_BANK_SELECT
@@ -272,7 +278,7 @@ bool EE_Format(void)
   */
 void EE_Read(void)
 {
-  uint8_t *data = eeHandle.DataPointer;
+  uint8_t *data = eeHandle.pData;
 #ifdef HAL_ICACHE_MODULE_ENABLED
     /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
@@ -282,7 +288,7 @@ void EE_Read(void)
     /* reading flash */
     for (uint32_t i = 0; i < eeHandle.Size; i++)
     {
-      *data = (*(__IO uint8_t*) (EE_ADDRESS + i));
+      *data = (*(__IO uint8_t*) (eeHandle.Address + i));
       data++;
     }
   }
@@ -302,7 +308,7 @@ void EE_Read(void)
 bool EE_Write(void)
 {
   bool answer = true;
-  uint8_t *data = eeHandle.DataPointer;
+  uint8_t *data = eeHandle.pData;
   do
   {
     /* checking eeprom is initialize correctly */
@@ -328,7 +334,7 @@ bool EE_Write(void)
     {
       uint64_t halfWord;
       memcpy((uint8_t*)&halfWord, data, 2);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, EE_ADDRESS + i, halfWord) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, eeHandle.Address + i, halfWord) != HAL_OK)
       {
         answer = false;
         break;
@@ -341,7 +347,7 @@ bool EE_Write(void)
     {
       uint64_t doubleWord;
       memcpy((uint8_t*)&doubleWord, data, 8);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, EE_ADDRESS + i, doubleWord) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, eeHandle.Address + i, doubleWord) != HAL_OK)
       {
         answer = false;
         break;
@@ -352,7 +358,7 @@ bool EE_Write(void)
     /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size; i += 16)
     {
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, eeHandle.Address + i, (uint32_t)data) != HAL_OK)
       {
         answer = false;
         break;
@@ -363,7 +369,7 @@ bool EE_Write(void)
     /* writing buffer to flash */
     for (uint32_t i = 0; i < eeHandle.Size; i += FLASH_NB_32BITWORD_IN_FLASHWORD * 4)
     {
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, EE_ADDRESS + i, (uint32_t)data) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, eeHandle.Address + i, (uint32_t)data) != HAL_OK)
       {
         answer = false;
         break;
@@ -372,10 +378,10 @@ bool EE_Write(void)
     }
 #endif
     /* verifying Flash content */
-    data = eeHandle.DataPointer;
+    data = eeHandle.pData;
     for (uint32_t i = 0; i < eeHandle.Size; i++)
     {
-      if (*data != (*(__IO uint8_t*) (EE_ADDRESS + i)))
+      if (*data != (*(__IO uint8_t*) (eeHandle.Address + i)))
       {
         answer = false;
         break;

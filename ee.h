@@ -9,9 +9,12 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.1.3
+  Version:    3.2.0
   
   History:
+              3.2.0
+              - Added Manual Configuration
+
               3.1.3
               - Fixed L0, L1 configuration
         
@@ -61,8 +64,12 @@ extern "C"
 
 typedef struct
 {
-  uint8_t                *DataPointer;
+  uint8_t                *pData;
   uint32_t               Size;
+  uint32_t               PageSectorSize;
+  uint32_t               Address;
+  uint8_t                PageSectorNumber;
+  uint8_t                BankNumber;
 
 } EE_HandleTypeDef;
 
@@ -70,7 +77,7 @@ typedef struct
 **************    Public Functions
 ************************************************************************************************************/
 
-bool      EE_Init(void *StoragePointer, uint32_t Size);
+bool      EE_Init(void *pData, uint32_t Size);
 uint32_t  EE_Capacity(void);
 bool      EE_Format(void);
 void      EE_Read(void);
