@@ -88,10 +88,6 @@
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
 #endif
 
-#ifdef  STM32W0
-#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#endif
-
 #ifdef  STM32WBA
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
 #undef  FLASH_BANK_1
@@ -142,11 +138,6 @@ bool EE_Init(void *pData, uint32_t Size)
       break;    
     }
 #if EE_MANUAL_CONFIG == false
-#if defined FLASH_BANK_2
-    eeHandle.BankNumber = FLASH_BANK_2;
-#elif  defined FLASH_BANK_1
-    eeHandle.BankNumber = FLASH_BANK_1;
-#endif
 #if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
 #ifdef FLASH_PAGE_SIZE
     eeHandle.PageSectorSize = FLASH_PAGE_SIZE;
@@ -158,24 +149,22 @@ bool EE_Init(void *pData, uint32_t Size)
 #error EE Library should be set manually for your MCU!
 #endif
 #endif
-    if (eeHandle.BankNumber == FLASH_BANK_1)
-    {
-      eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
-    }
-    else
-    {
-      eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize / 2) - 1);
-    }
-    if (eeHandle.BankNumber == FLASH_BANK_1)
-    {
-      eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
-    }
-    else
-    {
-      eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * (eeHandle.PageSectorNumber * 2 + 1));
-    }
+#if defined FLASH_BANK_2
+    eeHandle.BankNumber = FLASH_BANK_2;
+    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize / 2) - 1);
+    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * (eeHandle.PageSectorNumber * 2 + 1));
+#elif defined FLASH_BANK_1
+    eeHandle.BankNumber = FLASH_BANK_1;
+    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
+    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
+#else
+    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
+    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
+#endif
 #else // manual
+#if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
     eeHandle.BankNumber = EE_SELECTED_BANK;
+#endif
     eeHandle.PageSectorNumber = EE_SELECTED_PAGE_SECTOR_NUMBER;
     eeHandle.PageSectorSize = EE_SELECTED_PAGE_SECTOR_SIZE;
     eeHandle.Address = EE_SELECTED_ADDRESS;
@@ -242,8 +231,8 @@ bool EE_Format(void)
     flashErase.Sector = eeHandle.PageSectorNumber;
     flashErase.NbSectors = 1;
 #endif
-#ifdef EE_BANK_SELECT
-    flashErase.Banks = EE_BANK_SELECT;
+#if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
+    flashErase.Banks = eeHandle.BankNumber;
 #endif
 #ifdef FLASH_VOLTAGE_RANGE_3
     flashErase.VoltageRange = FLASH_VOLTAGE_RANGE_3;

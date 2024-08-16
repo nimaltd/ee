@@ -9,9 +9,12 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.2.0
+  Version:    3.2.1
   
   History:
+              3.2.1
+              - Fixed Selecting BANK for STM32W Series
+
               3.2.0
               - Added Manual Configuration
 
@@ -57,6 +60,7 @@ extern "C"
 **************    Public Definitions
 ************************************************************************************************************/
 
+// none
 
 /************************************************************************************************************
 **************    Public struct/enum
@@ -69,7 +73,9 @@ typedef struct
   uint32_t               PageSectorSize;
   uint32_t               Address;
   uint8_t                PageSectorNumber;
+#if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
   uint8_t                BankNumber;
+#endif
 
 } EE_HandleTypeDef;
 
