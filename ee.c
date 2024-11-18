@@ -69,11 +69,11 @@
 #endif
 
 #ifdef  STM32L0
-#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #endif
 
 #ifdef  STM32L1
-#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
+#define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #endif
 
 #ifdef  STM32L4

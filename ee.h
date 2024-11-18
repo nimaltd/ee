@@ -9,9 +9,12 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    3.2.1
+  Version:    3.2.2
   
   History:
+              3.2.2
+              - Fixed Erasing L0, L1, Series
+
               3.2.1
               - Fixed Selecting BANK for STM32W Series
 
