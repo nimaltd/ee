@@ -33,7 +33,7 @@ This library facilitates EEPROM emulation on microcontrollers by selecting the l
 ---
 The old Version: https://github.com/nimaltd/ee/archive/refs/tags/V2.0.6.zip
 
-```
+``` c
 #include "ee.h"
 typedef struct
 {
