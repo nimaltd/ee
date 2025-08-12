@@ -18,112 +18,87 @@
 #ifdef  STM32F0
 #define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32F1
 #define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32F2
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32F3
 #define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32F4
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
 #define FLASH_SIZE                          ((((uint32_t)(*((uint16_t *)FLASHSIZE_BASE)) & (0xFFFFU))) * 1024)
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32F7
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32H5
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32H7
 #define EE_ERASE                            EE_ERASE_SECTOR_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32G0
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32G4
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32U0
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
-#endif
-
-#ifdef  STM32U3
-#define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (uint32_t)(&(x))
 #endif
 
 #ifdef  STM32U5
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32L0
 #define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32L1
 #define EE_ERASE                            EE_ERASE_PAGE_ADDRESS
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32L4
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32L5
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32WB
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32WBA
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #undef  FLASH_BANK_1
 #endif
 
 #ifdef  STM32WL
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifdef  STM32C0
 #define EE_ERASE                            EE_ERASE_PAGE_NUMBER
-#define FLASH_DATA(x)   (x)
 #endif
 
 #ifndef EE_ERASE
@@ -348,7 +323,7 @@ bool EE_Write(void)
     {
       uint64_t halfWord;
       memcpy((uint8_t*)&halfWord, data, 2);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, eeHandle.Address + i, FLASH_DATA(halfWord)) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, eeHandle.Address + i, halfWord) != HAL_OK)
       {
         answer = false;
         break;
@@ -361,7 +336,7 @@ bool EE_Write(void)
     {
       uint64_t doubleWord;
       memcpy((uint8_t*)&doubleWord, data, 8);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, eeHandle.Address + i, FLASH_DATA(doubleWord)) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, eeHandle.Address + i, doubleWord) != HAL_OK)
       {
         answer = false;
         break;
