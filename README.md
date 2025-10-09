@@ -17,7 +17,7 @@ It supports all STM32 series that include programmable Flash memory:
 
 - 🧩 Fully **blocking, synchronous** operation
 - 💾 Uses **internal Flash** for data storage
-- 🧱 Configurable **page/sector size** and memory layout
+- 🧱 Configurable **page/sector size** and memory layout (Auto and Manual)
 - 🧠 Supports **data structure mapping** for easy use
 - ⚙️ Works with both **single-bank and dual-bank Flash** configurations
 - 🔐 Safe write mechanism to protect existing data
