@@ -62,24 +62,22 @@ Defines page/sector sizes and optional manual Flash configuration or Use Auto Se
 
 ---
 
+## 🧰 API Overview  
 
-## 🧩 API Overview
+| Function | Description |
+|----------|-------------|
+| `ee_init()` | Initialize EEPROM emulation module with a data buffer |
+| `ee_capacity()` | Get total emulated EEPROM capacity (in bytes) |
+| `ee_format()` | Erase and format the EEPROM area in Flash memory |
+| `ee_read()` | Load data from Flash into RAM buffer |
+| `ee_write()` | Save (write) the RAM buffer back to Flash memory |
 
-> **Note:** The library uses the `EE_*` naming convention in this (new) version:
-
-```c
-bool     EE_Init(void *data, uint32_t size);   // Initialize EEPROM emulation with a RAM data buffer
-uint32_t EE_Capacity(void);                    // Get total emulated EEPROM capacity (bytes)
-bool     EE_Format(void);                      // Erase/format EEPROM area
-void     EE_Read(void);                        // Read Flash into the provided RAM buffer
-bool     EE_Write(void);                       // Write the RAM buffer back to Flash
-```
 
 ---
 
 ## 🚀 Quick Start 
 
-Use your data structure and the `EE_*` API exactly like this:
+Use your data structure like this:
 
 ```c
 #include "ee.h"
