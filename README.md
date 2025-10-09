@@ -44,19 +44,9 @@ Future support will be available via the official STM32 pack repository.
 
 ## 🔧 Configuration (`ee_config.h`)
 
-Defines page/sector sizes and optional manual Flash configuration.
+Defines page/sector sizes and optional manual Flash configuration or Use Auto Selection (define EE_MANUAL_CONFIG = 0). See `ee_config.h`:
 
 ```c
-#define EE_PAGE_SECTOR_SIZE_1K            (1024 * 1)
-#define EE_PAGE_SECTOR_SIZE_2K            (1024 * 2)
-#define EE_PAGE_SECTOR_SIZE_4K            (1024 * 4)
-#define EE_PAGE_SECTOR_SIZE_8K            (1024 * 8)
-#define EE_PAGE_SECTOR_SIZE_16K           (1024 * 16)
-#define EE_PAGE_SECTOR_SIZE_32K           (1024 * 32)
-#define EE_PAGE_SECTOR_SIZE_64K           (1024 * 64)
-#define EE_PAGE_SECTOR_SIZE_128K          (1024 * 128)
-#define EE_PAGE_SECTOR_SIZE_256K          (1024 * 256)
-
 /* USER CODE BEGIN EE_CONFIGURATION */
 
 #define EE_MANUAL_CONFIG                  0
@@ -72,96 +62,60 @@ Defines page/sector sizes and optional manual Flash configuration.
 
 ---
 
-## 🔧 EEPROM Structure (`ee_t`)
-
-```c
-typedef struct
-{
-  uint8_t   *data;               // Pointer to data buffer
-  uint32_t   size;               // Total data size
-  uint32_t   page_sector_size;   // Flash sector/page size
-  uint32_t   address;            // Base flash address
-  uint8_t    page_sector_number; // Number of pages/sectors used
-#if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
-  uint8_t    bank_number;        // Flash bank (if dual-bank available)
-#endif
-} ee_t;
-```
-
-Example configuration:
-```c
-ee_t eeprom;
-eeprom.data = my_data;
-eeprom.size = sizeof(my_data);
-eeprom.page_sector_size = EE_SELECTED_PAGE_SECTOR_SIZE;
-eeprom.address = EE_SELECTED_ADDRESS;
-eeprom.page_sector_number = EE_SELECTED_PAGE_SECTOR_NUMBER;
-```
-
----
 
 ## 🧩 API Overview
 
-| Function | Description |
-|-----------|-------------|
-| `bool ee_init(void *data, uint32_t size)` | Initializes the EEPROM emulation module |
-| `uint32_t ee_capacity(void)` | Returns total emulated EEPROM capacity |
-| `bool ee_format(void)` | Formats the EEPROM area (erases sectors) |
-| `void ee_read(void)` | Reads data from Flash to buffer |
-| `bool ee_write(void)` | Writes data buffer to Flash memory |
+> **Note:** The library uses the `EE_*` naming convention in this (new) version:
+
+```c
+bool     EE_Init(void *data, uint32_t size);   // Initialize EEPROM emulation with a RAM data buffer
+uint32_t EE_Capacity(void);                    // Get total emulated EEPROM capacity (bytes)
+bool     EE_Format(void);                      // Erase/format EEPROM area
+void     EE_Read(void);                        // Read Flash into the provided RAM buffer
+bool     EE_Write(void);                       // Write the RAM buffer back to Flash
+```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start 
 
-### 1. Include header
+Use your data structure and the `EE_*` API exactly like this:
+
 ```c
 #include "ee.h"
+
+typedef struct
+{
+ uint32_t val1;
+ int16_t val2;
+ int8_t val3;
+ float val4;
+
+} stotrage_t;
+
+stotrage_t ee_data;
+
+int main(void)
+{
+  // HAL / system init ...
+  // ...
+
+  ee_init(&ee_data, sizeof(stotrage_t));
+  ee_read();
+
+  ee_data.val1 = 10000;
+  ee_data.val2 = -202;
+  ee_data.val3 = -3;
+  ee_data.val4 = 4.5f;
+
+  ee_write();
+
+  while (1)
+  {
+    // main loop...
+  }
+}
 ```
-
-### 2. Define data structure
-```c
-uint8_t user_settings[128];
-```
-
-### 3. Initialize EEPROM
-```c
-ee_init(user_settings, sizeof(user_settings));
-```
-
-### 4. Read stored data
-```c
-ee_read();
-```
-
-### 5. Modify and write new data
-```c
-user_settings[0] = 0x55;
-ee_write();
-```
-
-### 6. Format EEPROM (optional)
-```c
-ee_format();
-```
-
----
-
-## ⚙️ STM32CubeMX Setup
-
-1. **Flash Configuration**
-   - Ensure Flash programming is enabled.
-   - Disable write protection for the EEPROM region.
-
-2. **Memory Address**
-   - Choose a free Flash area (e.g., last 2 KB).
-   - Example: For STM32F103C8 (64 KB Flash) → Use `0x0800F800`.
-
-3. **Project Settings**
-   - Enable **HAL Flash** driver.
-   - Use **"Generate peripheral initialization as .c/.h files per peripheral"** option in CubeMX.
-
----
 
 ## 💡 Notes
 
@@ -188,11 +142,6 @@ If this project helped you, please **⭐ star** the repo and consider supporting
 ## 📜 License
 
 Licensed under the terms in the [LICENSE](./LICENSE.TXT).
-
-
-
-
-
 
 
 
