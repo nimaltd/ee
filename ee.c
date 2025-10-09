@@ -1,15 +1,34 @@
 
-/************************************************************************************************************
-**************    Include Headers
-************************************************************************************************************/
+/*
+ * @file        ee.c
+ * @brief       EEPROM Emulation library
+ * @author      Nima Askari
+ * @version     4.0.0
+ * @license     See the LICENSE file in the root folder.
+ *
+ * @note        All my libraries are dual-licensed.
+ *              Please review the licensing terms before using them.
+ *              For any inquiries, feel free to contact me.
+ *
+ * @github      https://www.github.com/nimaltd
+ * @linkedin    https://www.linkedin.com/in/nimaltd
+ * @youtube     https://www.youtube.com/@nimaltd
+ * @instagram   https://instagram.com/github.nimaltd
+ *
+ * Copyright (C) 2025 Nima Askari - NimaLTD. All rights reserved.
+ */
 
+/*************************************************************************************************/
+/** Includes **/
+/*************************************************************************************************/
+
+#include "ee_config.h"
 #include "ee.h"
-#include "NimaLTD.I-CUBE-EE_conf.h"
 #include <string.h>
 
-/************************************************************************************************************
-**************    Private Definitions
-************************************************************************************************************/
+/*************************************************************************************************/
+/** Private Definitions **/
+/*************************************************************************************************/
 
 #define EE_ERASE_PAGE_ADDRESS               0
 #define EE_ERASE_PAGE_NUMBER                1
@@ -105,79 +124,73 @@
 #error "Not Supported MCU!"
 #endif
 
-/************************************************************************************************************
-**************    Private Variables
-************************************************************************************************************/
+/*************************************************************************************************/
+/** Private Variables **/
+/*************************************************************************************************/
 
-EE_HandleTypeDef eeHandle;
+ee_t ee_handle;
 
-/************************************************************************************************************
-**************    Private Functions
-************************************************************************************************************/
+/*************************************************************************************************/
+/** Function Implementations **/
+/*************************************************************************************************/
 
-/************************************************************************************************************
-**************    Public Functions
-************************************************************************************************************/
-
+/*************************************************************************************************/
 /**
-  * @brief Initializes the EEPROM emulation module.
-  * @note This function initializes the EEPROM emulation module to enable read and write operations.
-  * @param pData: Pointer to the start address of the EEPROM emulation area.
-  * @param Size: Size of the EEPROM emulation area in bytes.
-  * @return Boolean value indicating the success of the initialization:
-  *       - true: Initialization successful.
-  *       - false: Initialization failed.
-  */
-bool EE_Init(void *pData, uint32_t Size)
+ * @brief Initializes the EEPROM emulation module.
+ * @param[in] data: Pointer to the start address of the EEPROM emulation area.
+ * @param[in] size: Size of the EEPROM emulation area in bytes.
+ * @return bool true if successful.
+ */
+bool ee_init(void *data, uint32_t size)
 {
   bool answer = false;
+  assert_param(data != NULL);
+  assert_param(size != 0);
+
   do
   {
-    if ((pData == NULL) || (Size == 0))
-    {
-      break;    
-    }
-#if EE_MANUAL_CONFIG == false
+#if (EE_MANUAL_CONFIG == 0)
 #if (EE_ERASE == EE_ERASE_PAGE_NUMBER) || (EE_ERASE == EE_ERASE_PAGE_ADDRESS)
 #ifdef FLASH_PAGE_SIZE
-    eeHandle.PageSectorSize = FLASH_PAGE_SIZE;
+    ee_handle.page_sector_size = FLASH_PAGE_SIZE;
 #endif
 #elif (EE_ERASE == EE_ERASE_SECTOR_NUMBER)
 #if defined FLASH_SECTOR_SIZE
-    eeHandle.PageSectorSize = FLASH_SECTOR_SIZE;
+    ee_handle.page_sector_size = FLASH_SECTOR_SIZE;
 #else
 #error EE Library should be set manually for your MCU!
 #endif
 #endif
 #if defined FLASH_BANK_2
-    eeHandle.BankNumber = FLASH_BANK_2;
-    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize / 2) - 1);
-    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * (eeHandle.PageSectorNumber * 2 + 1));
+    ee_handle.bank_number = FLASH_BANK_2;
+    ee_handle.page_sector_number = ((FLASH_SIZE / ee_handle.page_sector_size / 2) - 1);
+    ee_handle.address = (FLASH_BASE + ee_handle.page_sector_size * (ee_handle.page_sector_number * 2 + 1));
 #elif defined FLASH_BANK_1
-    eeHandle.BankNumber = FLASH_BANK_1;
-    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
-    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
+    ee_handle.bank_number = FLASH_BANK_1;
+    ee_handle.page_sector_number = ((FLASH_SIZE / ee_handle.page_sector_size) - 1);
+    ee_handle.address = (FLASH_BASE + ee_handle.page_sector_size * ee_handle.page_sector_number);
 #else
-    eeHandle.PageSectorNumber = ((FLASH_SIZE / eeHandle.PageSectorSize) - 1);
-    eeHandle.Address = (FLASH_BASE + eeHandle.PageSectorSize * eeHandle.PageSectorNumber);
+    ee_handle.page_sector_number = ((FLASH_SIZE / ee_handle.page_sector_size) - 1);
+    ee_handle.address = (FLASH_BASE + ee_handle.page_sector_size * ee_handle.page_sector_number);
 #endif
-#else // manual
+/* Manual Config */
+#else
 #if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
-    eeHandle.BankNumber = EE_SELECTED_BANK;
+    ee_handle.bank_number = EE_SELECTED_BANK;
 #endif
-    eeHandle.PageSectorNumber = EE_SELECTED_PAGE_SECTOR_NUMBER;
-    eeHandle.PageSectorSize = EE_SELECTED_PAGE_SECTOR_SIZE;
-    eeHandle.Address = EE_SELECTED_ADDRESS;
+    ee_handle.page_sector_number = EE_SELECTED_PAGE_SECTOR_NUMBER;
+    ee_handle.page_sector_size = EE_SELECTED_PAGE_SECTOR_SIZE;
+    ee_handle.address = EE_SELECTED_ADDRESS;
 #endif
     /* checking size of eeprom area*/
-    if (Size > eeHandle.PageSectorSize)
+    if (size > ee_handle.page_sector_size)
     {
-      eeHandle.Size = 0;
-      eeHandle.pData = NULL;
+      ee_handle.size = 0;
+      ee_handle.data = NULL;
       break;
     }
-    eeHandle.Size = Size;
-    eeHandle.pData = (uint8_t*)pData;
+    ee_handle.size = size;
+    ee_handle.data = (uint8_t*)data;
     answer = true;
 
   } while (0);
@@ -185,63 +198,59 @@ bool EE_Init(void *pData, uint32_t Size)
   return answer;
 }
 
-/***********************************************************************************************************/
-
+/*************************************************************************************************/
 /**
-  * @brief Retrieves the capacity of the EEPROM emulation area.
-  * @note This function returns the total capacity of the EEPROM emulation area in bytes.
-  * @return Capacity of the EEPROM emulation area in bytes.
-  */
-uint32_t EE_Capacity(void)
+ * @brief Retrieves the capacity of the EEPROM emulation area.
+ * @return uint32_t Capacity of the EEPROM emulation area in bytes.
+ */
+uint32_t ee_capacity(void)
 {
-  return eeHandle.PageSectorSize;
+  return ee_handle.page_sector_size;
 }
 
-/***********************************************************************************************************/
-
+/*************************************************************************************************/
 /**
-  * @brief Formats the EEPROM emulation area.
-  * @note This function formats the EEPROM emulation area,
-  * @return bool Boolean value indicating the success of the operation:
-  *     - true: Formatting successful.
-  *     - false: Formatting failed.
-  */
-bool EE_Format(void)
+ * @brief Formats the EEPROM emulation area.
+ * @return bool true if successful.
+ */
+bool ee_format(void)
 {
   bool answer = false;
   uint32_t error;
-  FLASH_EraseInitTypeDef flashErase;
+  FLASH_EraseInitTypeDef flash_erase;
   do
   {
     HAL_FLASH_Unlock();
 #ifdef HAL_ICACHE_MODULE_ENABLED
+
     /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
 #endif
 #if EE_ERASE == EE_ERASE_PAGE_ADDRESS
-    flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-    flashErase.PageAddress = eeHandle.Address;
-    flashErase.NbPages = 1;
+    flash_erase.TypeErase = FLASH_TYPEERASE_PAGES;
+    flash_erase.PageAddress = ee_handle.address;
+    flash_erase.NbPages = 1;
 #elif EE_ERASE == EE_ERASE_PAGE_NUMBER
-    flashErase.TypeErase = FLASH_TYPEERASE_PAGES;
-    flashErase.Page = eeHandle.PageSectorNumber;
-    flashErase.NbPages = 1;
+    flash_erase.TypeErase = FLASH_TYPEERASE_PAGES;
+    flash_erase.Page = ee_handle.page_sector_number;
+    flash_erase.NbPages = 1;
 #else
-    flashErase.TypeErase = FLASH_TYPEERASE_SECTORS;
-    flashErase.Sector = eeHandle.PageSectorNumber;
-    flashErase.NbSectors = 1;
+    flash_erase.TypeErase = FLASH_TYPEERASE_SECTORS;
+    flash_erase.Sector = ee_handle.page_sector_number;
+    flash_erase.NbSectors = 1;
 #endif
 #if (defined FLASH_BANK_1) || (defined FLASH_BANK_2)
-    flashErase.Banks = eeHandle.BankNumber;
+    flash_erase.Banks = ee_handle.bank_number;
 #endif
 #ifdef FLASH_VOLTAGE_RANGE_3
-    flashErase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+    flash_erase.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 #endif
     /* erasing page/sector */
-    if (HAL_FLASHEx_Erase(&flashErase, &error) != HAL_OK)
+    if (HAL_FLASHEx_Erase(&flash_erase, &error) != HAL_OK)
     {
       break;
     }
+
     /* checking result */
     if (error != 0xFFFFFFFF)
     {
@@ -258,16 +267,13 @@ bool EE_Format(void)
   return answer;
 }
 
-/***********************************************************************************************************/
-
+/*************************************************************************************************/
 /**
-  * @brief Reads data from the EEPROM emulation area.
-  * @note This function reads data from the EEPROM emulation area
-  *  and loads it into the specified storage pointer.
-  */
-void EE_Read(void)
+ * @brief Reads data from the EEPROM emulation area.
+ */
+void ee_read(void)
 {
-  uint8_t *data = eeHandle.pData;
+  uint8_t *data = ee_handle.data;
 #ifdef HAL_ICACHE_MODULE_ENABLED
     /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
@@ -275,29 +281,28 @@ void EE_Read(void)
   if (data != NULL)
   {
     /* reading flash */
-    for (uint32_t i = 0; i < eeHandle.Size; i++)
+    for (uint32_t i = 0; i < ee_handle.size; i++)
     {
-      *data = (*(__IO uint8_t*) (eeHandle.Address + i));
+      *data = (*(__IO uint8_t*) (ee_handle.address + i));
       data++;
     }
   }
 #ifdef HAL_ICACHE_MODULE_ENABLED
+
     /* disabling ICACHE if enabled*/
     HAL_ICACHE_Enable();
 #endif
 }
 
-/***********************************************************************************************************/
-
+/*************************************************************************************************/
 /**
-  * @brief Writes data to the EEPROM emulation area.
-  * @note This function writes data to the EEPROM emulation area.
-  * @retval true if the write operation is successful, false otherwise.
-  */
-bool EE_Write(void)
+ * @brief Writes data to the EEPROM emulation area.
+ * @retval true if the write operation is successful, false otherwise.
+ */
+bool ee_write(void)
 {
   bool answer = true;
-  uint8_t *data = eeHandle.pData;
+  uint8_t *data = ee_handle.data;
   do
   {
     /* checking eeprom is initialize correctly */
@@ -306,24 +311,27 @@ bool EE_Write(void)
       answer = false;
       break;
     }
+
     /* formating flash area before writing */
-    if (EE_Format() == false)
+    if (ee_format() == false)
     {
       answer = false;
       break;
     }
     HAL_FLASH_Unlock();
 #ifdef HAL_ICACHE_MODULE_ENABLED
+
     /* disabling ICACHE if enabled*/
     HAL_ICACHE_Disable();
 #endif
 #if (defined FLASH_TYPEPROGRAM_HALFWORD)
+
     /* writing buffer to flash */
-    for (uint32_t i = 0; i < eeHandle.Size ; i += 2)
+    for (uint32_t i = 0; i < ee_handle.size ; i += 2)
     {
-      uint64_t halfWord;
-      memcpy((uint8_t*)&halfWord, data, 2);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, eeHandle.Address + i, halfWord) != HAL_OK)
+      uint64_t half_word;
+      memcpy((uint8_t*)&half_word, data, 2);
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, ee_handle.address + i, half_word) != HAL_OK)
       {
         answer = false;
         break;
@@ -331,12 +339,13 @@ bool EE_Write(void)
       data += 2;
     }
 #elif (defined FLASH_TYPEPROGRAM_DOUBLEWORD)
+
     /* writing buffer to flash */
-    for (uint32_t i = 0; i < eeHandle.Size; i += 8)
+    for (uint32_t i = 0; i < ee_handle.size; i += 8)
     {
-      uint64_t doubleWord;
-      memcpy((uint8_t*)&doubleWord, data, 8);
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, eeHandle.Address + i, doubleWord) != HAL_OK)
+      uint64_t double_word;
+      memcpy((uint8_t*)&double_word, data, 8);
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, ee_handle.address + i, doubleWord) != HAL_OK)
       {
         answer = false;
         break;
@@ -344,10 +353,11 @@ bool EE_Write(void)
       data += 8;
     }
 #elif (defined FLASH_TYPEPROGRAM_QUADWORD)
+
     /* writing buffer to flash */
-    for (uint32_t i = 0; i < eeHandle.Size; i += 16)
+    for (uint32_t i = 0; i < ee_handle.size; i += 16)
     {
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, eeHandle.Address + i, (uint32_t)data) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_QUADWORD, ee_handle.address + i, (uint32_t)data) != HAL_OK)
       {
         answer = false;
         break;
@@ -355,10 +365,11 @@ bool EE_Write(void)
       data += 16;
     }
 #elif (defined FLASH_TYPEPROGRAM_FLASHWORD)
+
     /* writing buffer to flash */
-    for (uint32_t i = 0; i < eeHandle.Size; i += FLASH_NB_32BITWORD_IN_FLASHWORD * 4)
+    for (uint32_t i = 0; i < ee_handle.size; i += FLASH_NB_32BITWORD_IN_FLASHWORD * 4)
     {
-      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, eeHandle.Address + i, (uint32_t)data) != HAL_OK)
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, ee_handle.address + i, (uint32_t)data) != HAL_OK)
       {
         answer = false;
         break;
@@ -367,10 +378,10 @@ bool EE_Write(void)
     }
 #endif
     /* verifying Flash content */
-    data = eeHandle.pData;
-    for (uint32_t i = 0; i < eeHandle.Size; i++)
+    data = ee_handle.data;
+    for (uint32_t i = 0; i < ee_handle.size; i++)
     {
-      if (*data != (*(__IO uint8_t*) (eeHandle.Address + i)))
+      if (*data != (*(__IO uint8_t*) (ee_handle.address + i)))
       {
         answer = false;
         break;
@@ -387,4 +398,6 @@ bool EE_Write(void)
   return answer;
 }
 
-/***********************************************************************************************************/
+/*************************************************************************************************/
+/** End of File **/
+/*************************************************************************************************/
