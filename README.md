@@ -118,9 +118,7 @@ int main(void)
 ## 💡 Notes
 
 - Flash erase/write cycles are **limited** — avoid frequent writes.
-- Use RAM buffers and **write only when data changes**.
-- For dual-bank devices, use `bank_number` to select target bank.
-- Supports both **small data arrays** and **structured types**.
+- For some series should enable 'EE_MANUAL_CONFIG'.
 
 ---
 # Watch the Video ( Previous version ):
