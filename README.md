@@ -6,10 +6,7 @@ This library allows you to **store and retrieve non-volatile data** using the ST
 
 It provides a lightweight API for **initialization, read, write, format**, and **capacity management**, making it easy to integrate into any STM32 project.
 
-It supports all STM32 series that include programmable Flash memory:
-
-- 🔹 **STM32F0 / F1 / F3 / F4 / F7 / G0 / G4 / H7**
-- 🔹 **STM32L0 / L4 / L5** and others
+It supports all STM32 series.
 
 ---
 
